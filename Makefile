@@ -20,6 +20,6 @@ feed: unzip_hmf feed_hmf
 unzip_hmf:
 	@rm -rf archive 2>/dev/null; unzip -q archive
 
-# Pipe USD market feed to stdout, test with wc -l {{{1
+# Pipe USD market feed to tbot.sh {{{1
 feed_hmf:
-	@cd archive; for f in *.* ; do echo $$f | grep USD | xargs cat; done | wc -l
+	@for f in archive/*.*; do echo $$f | grep USD | xargs cat; done | ./tbot.sh
