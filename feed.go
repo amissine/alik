@@ -66,7 +66,7 @@ func main () { // {{{1
     var q MarketFeed
     if e := dec.Decode(&q); e != nil {
       log.Println(e)
-      return
+      break
     }
     if q.Same(p) {
       log.Println(q)
@@ -75,7 +75,8 @@ func main () { // {{{1
     p = &q
     if e := enc.Encode(&q); e != nil {
       log.Println(e)
-      return
+      break
     }
   }
+  log.Println("exiting")
 }
