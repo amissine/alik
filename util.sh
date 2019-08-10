@@ -1,19 +1,42 @@
-# Utils {{{1
+# util.sh {{{1
 
-declare -i PID2KILL=-1
+declare -i CAAS_N=500
+let LIMIT=CAAS_N+CAAS_N
 
-sip () { # {{{2
-  for file2tail in $@; do
-    tail -n 999999 -f $file2tail &
-    PID2KILL=$!
-  done
+# }}}1
+log () { # {{{1
+  echo "$1" 1>&2
 }
 
-pour () { # {{{2
-  local file2tail=$1
-  rm -f $file2tail 2>/dev/null; touch $file2tail
-  sip $file2tail
-  tail -n 999999 -f >> $file2tail
-  echo "pour exiting PID2KILL $PID2KILL" 1>&2
-  sleep 1; kill $PID2KILL
+pipe_in () { # {{{1
+  log "pipe_in: started, shall kill $2"
+  cat -u >> $1
+  sleep 1; kill $2
+  log "pipe_in: killed $2, now exiting"
+}
+
+pipe_out () { # {{{1
+  tail -n 999999 -f $1 &
+}
+
+file_can_grow () { # {{{1
+  let capacity=LIMIT-$1; let rc=0
+  log "file_can_grow: count $1 capacity $capacity"
+  [ $capacity -gt 0 ] || let rc=1
+  return $rc
+}
+
+pour () { # {{{1
+  rm -f $1 2>/dev/null; touch $1
+  pipe_out $1
+  local pid2kill=$!
+  pipe_in $1 $pid2kill &
+  while true; do
+    while file_can_grow `wc -l $1`; do
+      kill -0 $pid2kill 2>/dev/null; [ $? -eq 0 ] || return 0
+      sleep 5
+    done
+    log "pour: archiving and rotating $1"
+    let LIMIT=LIMIT+LIMIT+LIMIT+LIMIT
+  done
 }

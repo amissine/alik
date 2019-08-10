@@ -1,9 +1,11 @@
 package main // import {{{1
 
 import (
+  "bufio"
   "encoding/json"
   "log"
   "os"
+  "time"
 )
 
 type MarketFeed struct { // {{{1
@@ -59,13 +61,15 @@ func (this *MarketFeed) Duplicate (mf *MarketFeed) bool { // {{{2
 }
 
 func main () { // {{{1
+  log.Println("started")
   dec := json.NewDecoder(os.Stdin)
-  enc := json.NewEncoder(os.Stdout)
+  w := bufio.NewWriter(os.Stdout)
+  enc := json.NewEncoder(w)
   var p *MarketFeed
   for {
     var q MarketFeed
     if e := dec.Decode(&q); e != nil {
-      log.Println(e)
+      log.Println("dec.Decode", e)
       break
     }
     if q.Same(p) {
@@ -73,10 +77,12 @@ func main () { // {{{1
       continue
     }
     p = &q
+    time.Sleep(10*time.Millisecond)
     if e := enc.Encode(&q); e != nil {
-      log.Println(e)
+      log.Println("enc.Encode", e)
       break
     }
+    w.Flush()
   }
   log.Println("exiting")
 }
