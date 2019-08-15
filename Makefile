@@ -22,4 +22,4 @@ unzip_hmf:
 
 # Pipe USD market feed to tbot.sh {{{1
 feed_hmf:
-	@for f in archive/*.*; do echo $$f | grep USD | xargs cat; done | ./tbot.sh
+	@for f in archive/*.mf; do echo $$f | grep USD | xargs cat; done | ./tbot.sh
