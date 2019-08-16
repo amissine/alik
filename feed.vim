@@ -34,7 +34,6 @@ argglobal
 $argadd Makefile
 set stal=2
 tabnew
-tabnew
 tabrewind
 edit service/feed.sh
 set splitbelow splitright
@@ -61,12 +60,12 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 2 + 24) / 48)
+exe '1resize ' . ((&lines * 4 + 24) / 48)
 exe '2resize ' . ((&lines * 2 + 24) / 48)
 exe '3resize ' . ((&lines * 2 + 24) / 48)
-exe '4resize ' . ((&lines * 20 + 24) / 48)
-exe '5resize ' . ((&lines * 3 + 24) / 48)
-exe '6resize ' . ((&lines * 11 + 24) / 48)
+exe '4resize ' . ((&lines * 18 + 24) / 48)
+exe '5resize ' . ((&lines * 2 + 24) / 48)
+exe '6resize ' . ((&lines * 12 + 24) / 48)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -187,12 +186,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 2 - ((1 * winheight(0) + 1) / 2)
+let s:l = 4 - ((3 * winheight(0) + 2) / 4)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2
-normal! 015|
+4
+normal! 019|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -576,20 +575,20 @@ setlocal wrap
 setlocal wrapmargin=0
 6
 normal! zo
-6
-normal! zc
-23
+11
 normal! zo
-29
+30
 normal! zo
-32
+36
 normal! zo
-let s:l = 33 - ((32 * winheight(0) + 10) / 20)
+40
+normal! zo
+let s:l = 18 - ((7 * winheight(0) + 9) / 18)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-33
-normal! 0
+18
+normal! 034|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -713,12 +712,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 1) / 3)
+let s:l = 2 - ((1 * winheight(0) + 1) / 2)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+2
+normal! 037|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -846,167 +845,20 @@ setlocal wrapmargin=0
 normal! zo
 20
 normal! zo
-let s:l = 22 - ((15 * winheight(0) + 5) / 11)
+let s:l = 19 - ((6 * winheight(0) + 6) / 12)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-22
-normal! 044|
+19
+normal! 0
 wincmd w
-4wincmd w
-exe '1resize ' . ((&lines * 2 + 24) / 48)
+6wincmd w
+exe '1resize ' . ((&lines * 4 + 24) / 48)
 exe '2resize ' . ((&lines * 2 + 24) / 48)
 exe '3resize ' . ((&lines * 2 + 24) / 48)
-exe '4resize ' . ((&lines * 20 + 24) / 48)
-exe '5resize ' . ((&lines * 3 + 24) / 48)
-exe '6resize ' . ((&lines * 11 + 24) / 48)
-tabnext
-edit ~/go/src/github.com/amissine/alik/service/update_feed.sh
-set splitbelow splitright
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-argglobal
-setlocal keymap=
-setlocal noarabic
-setlocal noautoindent
-setlocal backupcopy=
-setlocal balloonexpr=
-setlocal nobinary
-setlocal nobreakindent
-setlocal breakindentopt=
-setlocal bufhidden=
-setlocal buflisted
-setlocal buftype=
-setlocal nocindent
-setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
-setlocal cinoptions=
-setlocal cinwords=if,else,while,do,for,switch
-setlocal colorcolumn=
-setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
-setlocal commentstring=#%s
-setlocal complete=.,w,b,u,t,i
-setlocal concealcursor=
-setlocal conceallevel=0
-setlocal completefunc=
-setlocal nocopyindent
-setlocal cryptmethod=
-setlocal nocursorbind
-setlocal nocursorcolumn
-setlocal nocursorline
-setlocal define=
-setlocal dictionary=
-setlocal nodiff
-setlocal equalprg=
-setlocal errorformat=
-setlocal expandtab
-if &filetype != 'sh'
-setlocal filetype=sh
-endif
-setlocal fixendofline
-setlocal foldcolumn=0
-setlocal foldenable
-setlocal foldexpr=0
-setlocal foldignore=#
-setlocal foldlevel=0
-setlocal foldmarker={{{,}}}
-set foldmethod=marker
-setlocal foldmethod=marker
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldtext=foldtext()
-setlocal formatexpr=
-setlocal formatoptions=tcq
-setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
-setlocal formatprg=
-setlocal grepprg=
-setlocal iminsert=0
-setlocal imsearch=-1
-setlocal include=
-setlocal includeexpr=
-setlocal indentexpr=GetShIndent()
-setlocal indentkeys=0{,0},0),0],!^F,o,O,e,0=then,0=do,0=else,0=elif,0=fi,0=esac,0=done,0=end,),0=;;,0=;&,0=fin,0=fil,0=fip,0=fir,0=fix
-setlocal noinfercase
-setlocal iskeyword=@,48-57,_,192-255
-setlocal keywordprg=
-setlocal nolinebreak
-setlocal nolisp
-setlocal lispwords=
-setlocal nolist
-setlocal makeencoding=
-setlocal makeprg=
-setlocal matchpairs=(:),{:},[:]
-setlocal modeline
-setlocal modifiable
-setlocal nrformats=bin,octal,hex
-set number
-setlocal number
-setlocal numberwidth=4
-setlocal omnifunc=
-setlocal path=
-setlocal nopreserveindent
-setlocal nopreviewwindow
-setlocal quoteescape=\\
-setlocal noreadonly
-setlocal norelativenumber
-setlocal norightleft
-setlocal rightleftcmd=search
-setlocal noscrollbind
-setlocal scrolloff=-1
-setlocal shiftwidth=2
-setlocal noshortname
-setlocal sidescrolloff=-1
-setlocal signcolumn=auto
-setlocal nosmartindent
-setlocal softtabstop=0
-setlocal nospell
-setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
-setlocal spellfile=
-setlocal spelllang=en
-setlocal statusline=
-setlocal suffixesadd=
-setlocal swapfile
-setlocal synmaxcol=3000
-if &syntax != 'sh'
-setlocal syntax=sh
-endif
-setlocal tabstop=2
-setlocal tagcase=
-setlocal tags=
-setlocal termwinkey=
-setlocal termwinscroll=10000
-setlocal termwinsize=
-setlocal textwidth=0
-setlocal thesaurus=
-setlocal noundofile
-setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
-setlocal nowinfixheight
-setlocal nowinfixwidth
-setlocal wrap
-setlocal wrapmargin=0
-6
-normal! zo
-11
-normal! zo
-23
-normal! zo
-29
-normal! zo
-32
-normal! zo
-let s:l = 30 - ((29 * winheight(0) + 23) / 46)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-30
-normal! 028|
-lcd ~/go/src/github.com/amissine/alik
+exe '4resize ' . ((&lines * 18 + 24) / 48)
+exe '5resize ' . ((&lines * 2 + 24) / 48)
+exe '6resize ' . ((&lines * 12 + 24) / 48)
 tabnext
 edit ~/go/src/github.com/amissine/alik/feed/feed.go
 set splitbelow splitright
@@ -1137,23 +989,25 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
+2
+normal! zo
 63
 normal! zo
-let s:l = 87 - ((86 * winheight(0) + 23) / 46)
+let s:l = 8 - ((7 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-87
-normal! 023|
+8
+normal! 04|
 lcd ~/go/src/github.com/amissine/alik
 tabnext 1
 set stal=1
 badd +4 ~/go/src/github.com/amissine/alik/tbot.sh
-badd +22 ~/go/src/github.com/amissine/alik/Makefile
+badd +31 ~/go/src/github.com/amissine/alik/Makefile
 badd +36 ~/go/src/github.com/amissine/alik/util.sh
 badd +87 ~/go/src/github.com/amissine/alik/feed.go
 badd +2 ~/go/src/github.com/amissine/alik/util.env
-badd +20 ~/go/src/github.com/amissine/alik/service/update_feed.sh
+badd +18 ~/go/src/github.com/amissine/alik/service/update_feed.sh
 badd +87 ~/go/src/github.com/amissine/alik/feed/feed.go
 badd +2 ~/go/src/github.com/amissine/alik/service/feed_run.sh
 badd +0 ~/go/src/github.com/amissine/alik/service/feed.sh

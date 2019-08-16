@@ -5,7 +5,7 @@ import (
   "encoding/json"
   "log"
   "os"
-  "time"
+  //"time"
 )
 
 type MarketFeed struct { // {{{1
@@ -77,12 +77,12 @@ func main () { // {{{1
       continue
     }
     p = &q
-    time.Sleep(10*time.Millisecond)
+    //time.Sleep(10*time.Millisecond)
     if e := enc.Encode(&q); e != nil {
       log.Println("enc.Encode", e)
       break
     }
     w.Flush()
   }
-  log.Println("exiting")
+  log.Println("exiting...")
 }

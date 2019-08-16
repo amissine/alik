@@ -18,8 +18,9 @@ gobble: feed
 	@service/gobble.sh $(UMF)
 
 # Run service feed {{{1
-feed: feed/feed.go
+feed: feed/feed.go service/feed.sh
 	@echo '- updating service $@...'; sudo -E service/update_feed.sh $(UMF)
+	@sudo -E cat umf0.json >> /service/feed/sysin
 
 #feed2telete: unzip_hmf feed_hmf {{{1
 #	@echo; echo "  Goals successful: $^"; echo
