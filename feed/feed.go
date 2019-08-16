@@ -1,5 +1,5 @@
-package main // import {{{1
-
+package main
+// import {{{1
 import (
   "bufio"
   "encoding/json"

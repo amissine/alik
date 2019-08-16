@@ -5,16 +5,24 @@ $(if $(findstring /,$(MAKEFILE_LIST)),$(error Please only invoke this Makefile f
 # Run all shell commands with bash. {{{1
 SHELL := bash
 # Locals {{{1
-RECIPES = feed feed_hmf unzip_hmf
+RECIPES = gobble feed feed_hmf unzip_hmf
+UMF = /service/feed/log/main/current
 
 .PHONY: $(RECIPES)
 
-# Default recipe: feed {{{1
-default_recipe: feed
+# Default recipe: gobble {{{1
+default_recipe: gobble
 
-# Run feed {{{1
-feed: unzip_hmf feed_hmf
-	@echo; echo "  Goals successful: $^"; echo
+# Run service gobble {{{1
+gobble: feed
+	@service/gobble.sh $(UMF)
+
+# Run service feed {{{1
+feed: feed/feed.go
+	@echo '- updating service $@...'; sudo -E service/update_feed.sh $(UMF)
+
+#feed2telete: unzip_hmf feed_hmf {{{1
+#	@echo; echo "  Goals successful: $^"; echo
 
 # Unzip historical market feed {{{1
 unzip_hmf:
