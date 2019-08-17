@@ -84,5 +84,5 @@ func main () { // {{{1
     }
     w.Flush()
   }
-  log.Println("exiting...")
+  log.Println("exiting..")
 }

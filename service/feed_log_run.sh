@@ -1,2 +1,2 @@
 #!/bin/sh
-exec multilog t ./main
+exec multilog s100000 n22 ./main

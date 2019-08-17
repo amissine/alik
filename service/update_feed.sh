@@ -1,7 +1,10 @@
 #!/usr/bin/env bash # {{{1
 #
 # See also:
+# - http://cr.yp.to/daemontools.html
+# - http://thedjbway.b0llix.net/daemontools/blabbyd.html
 # - https://golang.org/doc/code.html
+# - https://www.balena.io/docs/learn/getting-started/raspberrypi3/go/
 
 # Locals {{{1
 GOPATH=$(go env GOPATH)
