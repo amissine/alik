@@ -61,7 +61,7 @@ func (this *MarketFeed) Duplicate (mf *MarketFeed) bool { // {{{2
 }
 
 func main () { // {{{1
-  log.Println("started")
+  log.Println(os.Getpid(), os.Args[1], "feed started")
   dec := json.NewDecoder(os.Stdin)
   w := bufio.NewWriter(os.Stdout)
   enc := json.NewEncoder(w)
@@ -84,5 +84,5 @@ func main () { // {{{1
     }
     w.Flush()
   }
-  log.Println("exiting..")
+  log.Println(os.Getpid(), os.Args[1], "feed exiting..")
 }

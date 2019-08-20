@@ -5,7 +5,15 @@ $(if $(findstring /,$(MAKEFILE_LIST)),$(error Please only invoke this Makefile f
 # Run all shell commands with bash. {{{1
 SHELL := bash
 # Locals {{{1
-RECIPES = simulate trade order_s order_t gobble feed feed_hmf unzip_hmf
+RECIPES = simulate trade order_s order_t \
+					gobble gobble_command_install gobble_service_update gobble_up \
+					feed feed_command_install feed_service_update feed_up \
+					feed_hmf unzip_hmf
+
+GOPATH = $(HOME)/go
+feed = $(GOPATH)/bin/feed
+feed_sh = service/feed.sh service/feed_run.sh service/feed_log_run.sh
+
 UMF = /service/feed/log/main/current
 BURP = /service/gobble/log/main/current
 ORDER = /service/order/log/main/current
@@ -34,13 +42,23 @@ order_t: gobble
 	@service/order.sh $(BURP) $(UMF) $(RES_T)
 
 # Run service gobble {{{1
-gobble: feed
-	@service/gobble.sh $(UMF) "/service/feed"
+gobble: gobble_command_install gobble_service_update gobble_up feed
+	@service/gobble.sh $(UMF)
 
 # Run service feed {{{1
-feed: feed/feed.go service/feed.sh service/feed_log_run.sh
-	@echo '- updating service $@...'; sudo -E service/update_feed.sh $(UMF)
-	@sudo -E cat umf0.json >> /service/feed/sysin
+feed: feed_command_install feed_service_update feed_up
+	@echo; echo "  Goals successful: $^"; echo
+
+#@sudo -E cat umf0.json >> /service/feed/sysin
+
+feed_command_install: feed/feed.go
+	@cd feed; go install; echo "- command feed installed to $(GOPATH)/bin"
+
+feed_service_update: $(feed) $(feed_sh)
+	@sudo -E service/update.sh feed $(UMF)
+
+feed_up:
+	@sudo svstat /service/feed
 
 #feed2telete: unzip_hmf feed_hmf {{{1
 #	@echo; echo "  Goals successful: $^"; echo
