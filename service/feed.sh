@@ -1,9 +1,9 @@
-#!/bin/sh
+#!/usr/local/bin/bash
 
 . util/common.sh
 
 #touch ./sysin; chgrp admin ./sysin; chmod 660 ./sysin;
-touch ./syserr; chgrp admin ./syserr; chmod 660 ./syserr;
+touch ./syserr; chgrp admin ./syserr; chmod 640 ./syserr;
 
 sdex_ob () { # {{{1
   local ASSET=$1

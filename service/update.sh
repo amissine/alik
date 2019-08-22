@@ -1,4 +1,5 @@
-#!/usr/bin/env bash # {{{1
+#!/usr/local/bin/bash
+# {{{1
 #
 # See also:
 # - http://cr.yp.to/daemontools.html

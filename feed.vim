@@ -1,40 +1,51 @@
 let SessionLoad = 1
 if &cp | set nocp | endif
+nmap <D-v> "*P
+vmap <D-v> "-d"*P
+vmap <D-c> "*y
+vmap <D-x> "*d
 let s:cpo_save=&cpo
 set cpo&vim
-map! <D-v> *
 vmap gx <Plug>NetrwBrowseXVis
 nmap gx <Plug>NetrwBrowseX
+vmap <BS> "-d
 vnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()
 nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(expand((exists("g:netrw_gx")? g:netrw_gx : '<cfile>')),netrw#CheckIfRemote())
-vmap <BS> "-d
-vmap <D-x> "*d
-vmap <D-c> "*y
-vmap <D-v> "-d"*P
-nmap <D-v> "*P
+map! <D-v> *
 let &cpo=s:cpo_save
 unlet s:cpo_save
 set backspace=indent,eol,start
 set expandtab
 set fileencodings=ucs-bom,utf-8,default,latin1
 set helplang=en
+set runtimepath=~/.vim,~/.vim/bundle/vim-fugitive,~/.vim/bundle/vim-pug,~/.vim/bundle/vim-scriptease,~/.vim/bundle/vim-sensible,/usr/local/share/vim/vimfiles,/usr/local/share/vim/vim81,/usr/local/share/vim/vimfiles/after,~/.vim/after
 set shiftwidth=2
 set tabstop=2
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
-silent tabonly
 cd ~/go/src/github.com/amissine/alik
 if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
+badd +7 Makefile
+badd +0 feed/feed.go
+badd +28 service/feed.sh
+badd +4 service/feed_run.sh
+badd +1 service/feed_log_run.sh
+badd +18 service/gobble.sh
+badd +17 service/update.sh
+badd +4 tbot.sh
+badd +36 util.sh
+badd +87 feed.go
+badd +2 util.env
+badd +11 service/update_feed.sh
+badd +3 util/common.sh
 argglobal
-%argdel
+silent! argdel *
 $argadd Makefile
 set stal=2
-tabnew
-tabrewind
 edit service/feed.sh
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -56,10 +67,7 @@ wincmd w
 set nosplitbelow
 set nosplitright
 wincmd t
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
+set winminheight=1 winheight=1 winminwidth=1 winwidth=1
 exe '1resize ' . ((&lines * 4 + 24) / 48)
 exe '2resize ' . ((&lines * 2 + 24) / 48)
 exe '3resize ' . ((&lines * 2 + 24) / 48)
@@ -152,10 +160,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -180,8 +186,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -195,7 +199,7 @@ normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
-if bufexists("~/go/src/github.com/amissine/alik/service/feed_run.sh") | buffer ~/go/src/github.com/amissine/alik/service/feed_run.sh | else | edit ~/go/src/github.com/amissine/alik/service/feed_run.sh | endif
+if bufexists('~/go/src/github.com/amissine/alik/service/feed_run.sh') | buffer ~/go/src/github.com/amissine/alik/service/feed_run.sh | else | edit ~/go/src/github.com/amissine/alik/service/feed_run.sh | endif
 setlocal keymap=
 setlocal noarabic
 setlocal noautoindent
@@ -281,10 +285,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -309,8 +311,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -324,7 +324,7 @@ normal! 027|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
-if bufexists("~/go/src/github.com/amissine/alik/service/feed_log_run.sh") | buffer ~/go/src/github.com/amissine/alik/service/feed_log_run.sh | else | edit ~/go/src/github.com/amissine/alik/service/feed_log_run.sh | endif
+if bufexists('~/go/src/github.com/amissine/alik/service/feed_log_run.sh') | buffer ~/go/src/github.com/amissine/alik/service/feed_log_run.sh | else | edit ~/go/src/github.com/amissine/alik/service/feed_log_run.sh | endif
 setlocal keymap=
 setlocal noarabic
 setlocal noautoindent
@@ -410,10 +410,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -438,8 +436,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -453,7 +449,7 @@ normal! 025|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
-if bufexists("~/go/src/github.com/amissine/alik/service/gobble.sh") | buffer ~/go/src/github.com/amissine/alik/service/gobble.sh | else | edit ~/go/src/github.com/amissine/alik/service/gobble.sh | endif
+if bufexists('~/go/src/github.com/amissine/alik/service/gobble.sh') | buffer ~/go/src/github.com/amissine/alik/service/gobble.sh | else | edit ~/go/src/github.com/amissine/alik/service/gobble.sh | endif
 setlocal keymap=
 setlocal noarabic
 setlocal noautoindent
@@ -539,10 +535,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -567,8 +561,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -582,7 +574,7 @@ normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
-if bufexists("~/go/src/github.com/amissine/alik/service/update.sh") | buffer ~/go/src/github.com/amissine/alik/service/update.sh | else | edit ~/go/src/github.com/amissine/alik/service/update.sh | endif
+if bufexists('~/go/src/github.com/amissine/alik/service/update.sh') | buffer ~/go/src/github.com/amissine/alik/service/update.sh | else | edit ~/go/src/github.com/amissine/alik/service/update.sh | endif
 setlocal keymap=
 setlocal noarabic
 setlocal noautoindent
@@ -668,10 +660,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -696,30 +686,30 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-9
+2
 normal! zo
-14
+10
 normal! zo
-31
+15
 normal! zo
-35
+32
 normal! zo
-let s:l = 14 - ((0 * winheight(0) + 7) / 15)
+36
+normal! zo
+let s:l = 1 - ((0 * winheight(0) + 7) / 15)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-14
-normal! 026|
+1
+normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
-if bufexists("~/go/src/github.com/amissine/alik/Makefile") | buffer ~/go/src/github.com/amissine/alik/Makefile | else | edit ~/go/src/github.com/amissine/alik/Makefile | endif
+if bufexists('~/go/src/github.com/amissine/alik/Makefile') | buffer ~/go/src/github.com/amissine/alik/Makefile | else | edit ~/go/src/github.com/amissine/alik/Makefile | endif
 setlocal keymap=
 setlocal noarabic
 setlocal noautoindent
@@ -805,10 +795,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -833,8 +821,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -850,22 +836,19 @@ normal! zt
 46
 normal! 027|
 wincmd w
+5wincmd w
 exe '1resize ' . ((&lines * 4 + 24) / 48)
 exe '2resize ' . ((&lines * 2 + 24) / 48)
 exe '3resize ' . ((&lines * 2 + 24) / 48)
 exe '4resize ' . ((&lines * 3 + 24) / 48)
 exe '5resize ' . ((&lines * 15 + 24) / 48)
 exe '6resize ' . ((&lines * 14 + 24) / 48)
-tabnext
-edit ~/go/src/github.com/amissine/alik/feed/feed.go
+tabedit ~/go/src/github.com/amissine/alik/feed/feed.go
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
 wincmd t
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
+set winminheight=1 winheight=1 winminwidth=1 winwidth=1
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -952,10 +935,8 @@ setlocal norelativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
-setlocal scrolloff=-1
 setlocal shiftwidth=2
 setlocal noshortname
-setlocal sidescrolloff=-1
 setlocal signcolumn=auto
 setlocal nosmartindent
 setlocal softtabstop=0
@@ -980,8 +961,6 @@ setlocal textwidth=0
 setlocal thesaurus=
 setlocal noundofile
 setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
 setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
@@ -999,22 +978,9 @@ normal! zt
 114
 normal! 033|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 2
+tabnext 1
 set stal=1
-badd +14 ~/go/src/github.com/amissine/alik/service/feed.sh
-badd +7 ~/go/src/github.com/amissine/alik/Makefile
-badd +87 ~/go/src/github.com/amissine/alik/feed/feed.go
-badd +4 ~/go/src/github.com/amissine/alik/service/feed_run.sh
-badd +1 ~/go/src/github.com/amissine/alik/service/feed_log_run.sh
-badd +18 ~/go/src/github.com/amissine/alik/service/gobble.sh
-badd +17 ~/go/src/github.com/amissine/alik/service/update.sh
-badd +4 ~/go/src/github.com/amissine/alik/tbot.sh
-badd +36 ~/go/src/github.com/amissine/alik/util.sh
-badd +87 ~/go/src/github.com/amissine/alik/feed.go
-badd +2 ~/go/src/github.com/amissine/alik/util.env
-badd +11 ~/go/src/github.com/amissine/alik/service/update_feed.sh
-badd +3 ~/go/src/github.com/amissine/alik/util/common.sh
-if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
+if exists('s:wipebuf') && s:wipebuf != bufnr('%')
   silent exe 'bwipe ' . s:wipebuf
 endif
 unlet! s:wipebuf
