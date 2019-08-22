@@ -15,5 +15,5 @@ kill_feeds () {
 }
 trap "sudo cat /service/feed/syserr | grep 'feed started' | kill_feeds" SIGINT
 
-echo '- hit Ctrl-C to exit'; echo
+echo '- hit Ctrl-C to clean up and exit'; echo
 sudo -E tail -F $1

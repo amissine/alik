@@ -5,18 +5,56 @@ import (
   "encoding/json"
   "log"
   "os"
-  //"time"
+  "time"
 )
+// see also:
+// - https://blog.golang.org/json-and-go
+// - https://www.ardanlabs.com/blog/2013/07/understanding-pointers-and-memory.html
 
 type MarketFeed struct { // {{{1
-  Ob struct {
-    Asset string; Asks, Bids OrderBook
-  }
+  Ob Spread
   Trade []interface{}
-  Ts float64
+  UTC time.Time
 }
 
-type OrderBook []struct{ Amount, Price float64 } // {{{2
+type Spread struct { Asset string; Asks, Bids OrderBook } // {{{2
+
+type OrderBook []struct { // {{{2
+  Amount, Price string; Price_r struct { D, N float64}
+}
+
+func (this *MarketFeed) Init (v *map[string]interface{}) *MarketFeed { // {{{2
+  w := *v
+  base, _ := w["base"]
+  asks, _ := w["asks"]
+  bids, _ := w["bids"]
+  loc, _ := time.LoadLocation("UTC")
+  this = &MarketFeed{
+    Ob: Spread {
+      Asset: base.(map[string]interface{})["asset_code"].(string),
+      Asks: ob(asks.([]interface{})),
+      Bids: ob(bids.([]interface{})),
+    },
+    UTC: time.Now().In(loc),
+  }
+  return this
+}
+
+func ob (b []interface{}) OrderBook {
+  c := make(OrderBook, len(b))
+  for i, v := range c {
+    v.Amount = b[i].(map[string]interface{})["amount"].(string)
+    v.Price = b[i].(map[string]interface{})["price"].(string)
+    v.Price_r.D =
+      b[i].(map[string]interface{})["price_r"].
+        (map[string]interface{})["d"].(float64)
+    v.Price_r.N =
+      b[i].(map[string]interface{})["price_r"].
+        (map[string]interface{})["n"].(float64)
+    c[i] = v
+  }
+  return c
+}
 
 func (this *MarketFeed) Same (mf *MarketFeed) bool { // {{{2
   if mf == nil {
@@ -54,7 +92,7 @@ func (this *MarketFeed) Duplicate (mf *MarketFeed) bool { // {{{2
   if mf == nil {
     return false
   }
-  if this.Ts != mf.Ts {
+  if !this.UTC.Equal(mf.UTC) {
     return false
   }
   return this.Same(mf)
@@ -65,20 +103,19 @@ func main () { // {{{1
   dec := json.NewDecoder(os.Stdin)
   w := bufio.NewWriter(os.Stdout)
   enc := json.NewEncoder(w)
-  var p *MarketFeed
+  var p, q *MarketFeed
   for {
-    var q MarketFeed
-    if e := dec.Decode(&q); e != nil {
+    var v map[string]interface{}
+    if e := dec.Decode(&v); e != nil {
       log.Println("dec.Decode", e)
       break
     }
-    if q.Same(p) {
-      log.Println(q)
+    if q = q.Init(&v); q.Same(p) {
+      log.Println("skipping", *q)
       continue
     }
-    p = &q
-    //time.Sleep(10*time.Millisecond)
-    if e := enc.Encode(&q); e != nil {
+    p = q
+    if e := enc.Encode(q); e != nil {
       log.Println("enc.Encode", e)
       break
     }
