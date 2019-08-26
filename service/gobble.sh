@@ -14,7 +14,7 @@ pipe_in_from_remote_feed () {
 }
 
 if [ -n "$REMOTE_FEED" ]; then
-  pipe_in_from_remote_feed
+  pipe_in_from_remote_feed | go run gobble/main.go
   exit 0
 fi
 

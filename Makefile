@@ -10,7 +10,6 @@ RECIPES = simulate trade order_s order_t \
 					feed_command_install feed_service_update feed_up \
 					feed_hmf unzip_hmf
 
-GOPATH = $(HOME)/go
 feed = $(GOPATH)/bin/feed
 feed_sh = service/feed.sh service/feed_run.sh service/feed_log_run.sh
 
