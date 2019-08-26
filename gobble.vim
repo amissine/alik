@@ -3,10 +3,10 @@ if &cp | set nocp | endif
 let s:cpo_save=&cpo
 set cpo&vim
 map! <D-v> *
-vmap <D-x> "*d
-vmap <D-c> "*y
-vmap <D-v> "-d"*P
 nmap <D-v> "*P
+vmap <D-v> "-d"*P
+vmap <D-c> "*y
+vmap <D-x> "*d
 vmap gx <Plug>NetrwBrowseXVis
 nmap gx <Plug>NetrwBrowseX
 vnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()
@@ -1130,27 +1130,29 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-14
+2
 normal! zo
-14
+15
+normal! zo
+15
 normal! zc
-101
+102
 normal! zo
-let s:l = 2 - ((1 * winheight(0) + 23) / 46)
+let s:l = 11 - ((10 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2
-normal! 0
+11
+normal! 037|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 2
+tabnext 3
 set stal=1
+badd +1 ~/go/src/github.com/amissine/alik/service/feed.sh
 badd +47 ~/go/src/github.com/amissine/alik/Makefile
 badd +1 ~/go/src/github.com/amissine/alik/feed/feed.go
-badd +1 ~/go/src/github.com/amissine/alik/service/feed.sh
 badd +4 ~/go/src/github.com/amissine/alik/service/feed_run.sh
 badd +1 ~/go/src/github.com/amissine/alik/service/feed_log_run.sh
-badd +18 ~/go/src/github.com/amissine/alik/service/gobble.sh
+badd +0 ~/go/src/github.com/amissine/alik/service/gobble.sh
 badd +17 ~/go/src/github.com/amissine/alik/service/update.sh
 badd +4 ~/go/src/github.com/amissine/alik/tbot.sh
 badd +36 ~/go/src/github.com/amissine/alik/util.sh
@@ -1169,6 +1171,7 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

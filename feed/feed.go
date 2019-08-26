@@ -8,6 +8,7 @@ import (
   "time"
 )
 // see also:
+// - https://golang.org/doc/code.html
 // - https://blog.golang.org/json-and-go
 // - https://www.ardanlabs.com/blog/2013/07/understanding-pointers-and-memory.html
 
