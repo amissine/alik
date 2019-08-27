@@ -21,7 +21,7 @@ sdex_ob () { # {{{1
         rc=$?
       done
       log "curl: $ASSET rc $rc" >>./syserr
-    } | ./feed $ASSET  2>>./syserr
+    } | ./feed 'sdex' $ASSET  2>>./syserr
   done
 } 
 

@@ -1,5 +1,8 @@
 # Usage examples {{{1
 #
+# See also:
+# - https://docs.google.com/document/d/11oG00Nvn6vcFC2AemFmSkZNp0trEFrUHxL0IrkGR45c
+
 # Check if 'make' runs from the directory where this Makefile resides. {{{1
 $(if $(findstring /,$(MAKEFILE_LIST)),$(error Please only invoke this Makefile from the directory it resides in))
 # Run all shell commands with bash. {{{1
@@ -13,11 +16,11 @@ RECIPES = simulate trade order_s order_t \
 feed = $(GOPATH)/bin/feed
 feed_sh = service/feed.sh service/feed_run.sh service/feed_log_run.sh
 
-UMF = /service/feed/log/main/current
-BURP = /service/gobble/log/main/current
-ORDER = /service/order/log/main/current
-RES_T = /service/trade/log/main/current
-RES_S = /service/simulate/log/main/current
+Umf = /service/feed/log/main/current
+Burp = /service/gobble/log/main/current
+Order = /service/order/log/main/current
+Res_T = /service/trade/log/main/current
+Res_S = /service/simulate/log/main/current
 
 REMOTE_FEED = mia-hub
 
@@ -28,23 +31,23 @@ default_recipe: gobble
 
 # Run service simulate {{{1
 simulate: order_s
-	@service/simulate.sh $(ORDER) $(UMF)
+	@service/simulate.sh $(Order) $(Umf)
 
 # Run service trade {{{1
 trade: order_t
-	@service/trade.sh $(ORDER)
+	@service/trade.sh $(Order)
 
 # Run service order alongside service simulate {{{1
 order_s: gobble
-	@service/order.sh $(BURP) $(UMF) $(RES_S)
+	@service/order.sh $(Burp) $(Umf) $(Res_S)
 
 # Run service order alongside service trade {{{1
 order_t: gobble
-	@service/order.sh $(BURP) $(UMF) $(RES_T)
+	@service/order.sh $(Burp) $(Umf) $(Res_T)
 
 # Run service gobble {{{1
 #gobble: gobble_command_install gobble_service_update gobble_up feed
-#	@UMF=$(UMF) service/gobble.sh
+#	@UMF=$(Umf) service/gobble.sh
 
 # Run service gobble, pipe in from remote feed {{{1
 gobble: gobble_command_install gobble_service_update gobble_up
@@ -60,7 +63,7 @@ feed_command_install: feed/feed.go
 	@cd feed; go install; echo "- command feed installed to $(GOPATH)/bin"
 
 feed_service_update: $(feed) $(feed_sh)
-	@sudo -E service/update.sh feed $(UMF)
+	@sudo -E service/update.sh feed $(Umf)
 
 feed_up:
 	@sudo svstat /service/feed
