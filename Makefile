@@ -2,6 +2,7 @@
 #
 # See also:
 # - https://docs.google.com/document/d/11oG00Nvn6vcFC2AemFmSkZNp0trEFrUHxL0IrkGR45c
+# - http://cr.yp.to/daemontools.html
 
 # Check if 'make' runs from the directory where this Makefile resides. {{{1
 $(if $(findstring /,$(MAKEFILE_LIST)),$(error Please only invoke this Makefile from the directory it resides in))

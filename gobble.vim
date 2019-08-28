@@ -360,27 +360,30 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-10
+1
 normal! zo
-32
+11
 normal! zo
-36
+33
 normal! zo
-40
+37
 normal! zo
-44
+41
 normal! zo
-48
+45
 normal! zo
-56
+49
 normal! zo
-let s:l = 42 - ((20 * winheight(0) + 11) / 22)
+57
+normal! zo
+let s:l = 3 - ((2 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-42
-normal! 03|
+3
+normal! 011|
 wincmd w
+2wincmd w
 exe '1resize ' . ((&lines * 22 + 24) / 48)
 exe '2resize ' . ((&lines * 22 + 24) / 48)
 tabnext
@@ -716,7 +719,6 @@ normal! zt
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
-2wincmd w
 exe '1resize ' . ((&lines * 22 + 24) / 48)
 exe '2resize ' . ((&lines * 22 + 24) / 48)
 tabnext
@@ -886,7 +888,7 @@ normal! zt
 3
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
-tabnext 2
+tabnext 1
 set stal=1
 badd +49 ~/go/src/github.com/amissine/alik/Makefile
 badd +0 ~/go/src/github.com/amissine/alik/service/gobble.sh
