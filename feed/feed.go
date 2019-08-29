@@ -11,8 +11,6 @@ import (
 
 // see also:
 // - https://golang.org/doc/code.html
-// - https://blog.golang.org/json-and-go
-// - https://github.com/fatih/vim-go
 
 func main() { // {{{1
 	log.Println(os.Getpid(), os.Args[1], os.Args[2], "feed started")

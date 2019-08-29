@@ -11,17 +11,17 @@ type Umf struct { // {{{1
 	UTC   time.Time
 }
 
-type Spread struct {
+type Spread struct { // {{{1
 	Asset      string
 	Asks, Bids OrderBook
-} // {{{2
+}
 
-type OrderBook []struct { // {{{2
+type OrderBook []struct { // {{{1
 	Amount, Price string
 	Price_r       struct{ D, N float64 }
 }
 
-func (this *Umf) Init(v *map[string]interface{}) *Umf { // {{{2
+func (this *Umf) Init(v *map[string]interface{}) *Umf { // {{{1
 	w := *v
 	base, _ := w["base"]
 	asks, _ := w["asks"]
@@ -43,16 +43,14 @@ func ob(b []interface{}) OrderBook {
 	for i, v := range c {
 		v.Amount = b[i].(map[string]interface{})["amount"].(string)
 		v.Price = b[i].(map[string]interface{})["price"].(string)
-		v.Price_r.D =
-			b[i].(map[string]interface{})["price_r"].(map[string]interface{})["d"].(float64)
-		v.Price_r.N =
-			b[i].(map[string]interface{})["price_r"].(map[string]interface{})["n"].(float64)
+		v.Price_r.D = b[i].(map[string]interface{})["price_r"].(map[string]interface{})["d"].(float64)
+		v.Price_r.N = b[i].(map[string]interface{})["price_r"].(map[string]interface{})["n"].(float64)
 		c[i] = v
 	}
 	return c
 }
 
-func (this *Umf) Same(mf *Umf) bool { // {{{2
+func (this *Umf) Same(mf *Umf) bool { // {{{1
 	if mf == nil {
 		return false
 	}
@@ -84,7 +82,7 @@ func (this *Umf) Same(mf *Umf) bool { // {{{2
 	return true
 }
 
-func (this *Umf) Duplicate(mf *Umf) bool { // {{{2
+func (this *Umf) Duplicate(mf *Umf) bool { // {{{1
 	if mf == nil {
 		return false
 	}
