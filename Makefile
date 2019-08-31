@@ -9,9 +9,6 @@ $(if $(findstring /,$(MAKEFILE_LIST)),$(error Please only invoke this Makefile f
 SHELL := bash
 # Locals {{{1
 
-# Why do I have to do this? TODO remove next line
-#GOPATH=$(HOME)/go
-
 RECIPES = simulate trade order_s order_t \
 					gobble gobble_service_update gobble_up \
 					feed_service_update feed_up \
@@ -27,8 +24,8 @@ Res_S = /service/simulate/log/main/current
 
 REMOTE_FEED = mia-hub
 
-# Default recipe: gobble {{{1
-default_recipe: gobble
+# Default recipe: feed {{{1
+default_recipe: feed
 
 # Run service simulate {{{1
 simulate: order_s
@@ -63,7 +60,7 @@ service/feed.sh service/feed_run.sh service/feed_log_run.sh
 	@sudo -E service/update.sh feed $(Umf)
 
 $(GOPATH)/bin/feed: feed/feed.go json/umf.go
-	@cd feed; go install; echo "- command feed installed to $(GOPATH)/bin"
+	@cd feed; go install; echo "- command feed installed in $(GOPATH)/bin"
 
 feed_up:
 	@sudo svstat /service/feed; sleep 1; tail -F $(Umf)

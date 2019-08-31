@@ -21,7 +21,7 @@ func main() { // {{{1
 	for {
 		var v map[string]interface{}
 		if e := dec.Decode(&v); e != nil {
-			log.Println("dec.Decode", e)
+			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
 		if q = q.Init(&v); q.Same(p) {
@@ -35,5 +35,5 @@ func main() { // {{{1
 		}
 		w.Flush()
 	}
-	log.Println(os.Getpid(), os.Args[1], os.Args[2], "feed exiting..")
+	log.Println(os.Getpid(), "feed exiting...")
 }

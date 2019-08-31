@@ -1,18 +1,12 @@
 #!/usr/local/bin/bash
-# {{{1
-#
-# See also:
-# - http://cr.yp.to/daemontools.html
+# See also {{{1
 # - http://thedjbway.b0llix.net/daemontools/blabbyd.html
-# - https://golang.org/doc/code.html
-# - https://www.balena.io/docs/learn/getting-started/raspberrypi3/go/
 
 # Locals {{{1
-GOPATH=$(go env GOPATH) # TODO Fix GOPATH in ../Makefile
 CMD=$GOPATH/bin/$1
 SVC_D=/var/svc.d/$1
 
-install_service () { # {{{2
+install_service () { # {{{1
   if [ -L /service/$1 ]; then
     cd /service/$1; rm /service/$1; svc -dx . log
     rm -rf $SVC_D

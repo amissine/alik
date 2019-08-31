@@ -1,2 +1,5 @@
-#!/bin/sh
-exec multilog s100000 n22 ./main
+#!/usr/local/bin/bash
+
+. util/common.sh
+
+exec multilog $LOG_SIZE $LOG_NUM./main

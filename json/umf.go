@@ -2,6 +2,7 @@ package json
 
 // import {{{1
 import (
+	"log"
 	"time"
 )
 
@@ -23,6 +24,7 @@ type OrderBook []struct { // {{{1
 
 func (this *Umf) Init(v *map[string]interface{}) *Umf { // {{{1
 	w := *v
+	log.Println(w)
 	base, _ := w["base"]
 	asks, _ := w["asks"]
 	bids, _ := w["bids"]
@@ -38,7 +40,7 @@ func (this *Umf) Init(v *map[string]interface{}) *Umf { // {{{1
 	return this
 }
 
-func ob(b []interface{}) OrderBook {
+func ob(b []interface{}) OrderBook { // {{{1
 	c := make(OrderBook, len(b))
 	for i, v := range c {
 		v.Amount = b[i].(map[string]interface{})["amount"].(string)
