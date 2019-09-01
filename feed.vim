@@ -66,6 +66,7 @@ let &cpo=s:cpo_save
 unlet s:cpo_save
 set autowrite
 set backspace=indent,eol,start
+set errorformat=%-G#\ %.%#,%-G%.%#panic:\ %m,%Ecan't\ load\ package:\ %m,%A%f:%l:%c:\ %m,%A%f:%l:\ %m,%C%*\\s%m,%-G%.%#
 set expandtab
 set fileencodings=ucs-bom,utf-8,default,latin1
 set helplang=en
@@ -82,7 +83,7 @@ endif
 set shortmess=aoO
 badd +60 Makefile
 badd +15 feed/feed.go
-badd +1 json/umf.go
+badd +34 json/umf.go
 badd +30 service/update.sh
 badd +1 service/feed.sh
 badd +3 service/feed_run.sh
@@ -225,15 +226,17 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
+9
+normal! zo
 26
 normal! zo
 30
 normal! zo
-let s:l = 1 - ((0 * winheight(0) + 6) / 12)
+let s:l = 24 - ((11 * winheight(0) + 6) / 12)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+24
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
@@ -358,12 +361,12 @@ setlocal wrapmargin=0
 normal! zo
 54
 normal! zo
-let s:l = 60 - ((43 * winheight(0) + 16) / 32)
+let s:l = 66 - ((47 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-60
-normal! 012|
+66
+normal! 044|
 wincmd w
 exe '1resize ' . ((&lines * 12 + 24) / 48)
 exe '2resize ' . ((&lines * 32 + 24) / 48)
@@ -1007,18 +1010,19 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-7
+5
 normal! zo
-29
+14
 normal! zo
-let s:l = 33 - ((32 * winheight(0) + 18) / 37)
+33
+normal! zo
+let s:l = 4 - ((3 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-33
+4
 normal! 0
 wincmd w
-5wincmd w
 exe '1resize ' . ((&lines * 1 + 24) / 48)
 exe '2resize ' . ((&lines * 1 + 24) / 48)
 exe '3resize ' . ((&lines * 1 + 24) / 48)
@@ -1037,9 +1041,9 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winminheight=1 winheight=1 winminwidth=1 winwidth=1
-exe '1resize ' . ((&lines * 14 + 24) / 48)
-exe '2resize ' . ((&lines * 14 + 24) / 48)
-exe '3resize ' . ((&lines * 15 + 24) / 48)
+exe '1resize ' . ((&lines * 6 + 24) / 48)
+exe '2resize ' . ((&lines * 5 + 24) / 48)
+exe '3resize ' . ((&lines * 32 + 24) / 48)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -1158,12 +1162,12 @@ setlocal wrap
 setlocal wrapmargin=0
 4
 normal! zo
-let s:l = 1 - ((0 * winheight(0) + 7) / 14)
+let s:l = 1 - ((0 * winheight(0) + 3) / 6)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 1
-normal! 011|
+normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -1283,7 +1287,7 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 7) / 14)
+let s:l = 1 - ((0 * winheight(0) + 2) / 5)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1408,17 +1412,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 7) / 15)
+let s:l = 7 - ((6 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 021|
+7
+normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
-exe '1resize ' . ((&lines * 14 + 24) / 48)
-exe '2resize ' . ((&lines * 14 + 24) / 48)
-exe '3resize ' . ((&lines * 15 + 24) / 48)
+3wincmd w
+exe '1resize ' . ((&lines * 6 + 24) / 48)
+exe '2resize ' . ((&lines * 5 + 24) / 48)
+exe '3resize ' . ((&lines * 32 + 24) / 48)
 tabedit ~/go/src/github.com/amissine/alik/feed/feed.go
 set splitbelow splitright
 set nosplitbelow
@@ -1571,12 +1576,12 @@ setlocal wrapmargin=0
 normal! zo
 15
 normal! zo
-let s:l = 1 - ((0 * winheight(0) + 23) / 46)
+let s:l = 31 - ((30 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+31
+normal! 026|
 lcd ~/go/src/github.com/amissine/alik
 tabedit ~/go/src/github.com/amissine/alik/json/umf.go
 set splitbelow splitright
@@ -1642,7 +1647,7 @@ setlocal define=
 setlocal dictionary=
 setlocal nodiff
 setlocal equalprg=
-setlocal errorformat=%-G#\ %.%#,%-G%.%#panic:\ %m,%Ecan't\ load\ package:\ %m,%A%f:%l:%c:\ %m,%A%f:%l:\ %m,%C%*\\s%m,%-G%.%#
+setlocal errorformat=
 setlocal noexpandtab
 if &filetype != 'go'
 setlocal filetype=go
@@ -1726,18 +1731,24 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-8
+9
 normal! zo
-24
+25
 normal! zo
-let s:l = 19 - ((18 * winheight(0) + 23) / 46)
+29
+normal! zo
+46
+normal! zo
+83
+normal! zo
+let s:l = 80 - ((78 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-19
-normal! 0
+80
+normal! 010|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 2
+tabnext 3
 set stal=1
 if exists('s:wipebuf') && s:wipebuf != bufnr('%')
   silent exe 'bwipe ' . s:wipebuf
