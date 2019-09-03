@@ -32,57 +32,98 @@ func (this *Umf) Init(v *map[string]interface{}) *Umf { // {{{1
 	bids, _ := w["bids"]
 	loc, _ := time.LoadLocation("UTC")
 	this = &Umf{
-		Asset: base.(map[string]interface{})["asset_code"].(string),
+		Asset:    base.(map[string]interface{})["asset_code"].(string),
 		Exchange: "sdex", // TODO other exchanges
 		Ob: Spread{
-			Asks:  ob(asks.([]interface{})),
-			Bids:  ob(bids.([]interface{})),
+			Asks: ob(asks.([]interface{})),
+			Bids: ob(bids.([]interface{})),
 		},
 		UTC: time.Now().In(loc),
 	}
 	return this // }}}2
 }
 
-func isTrade (v *map[string]interface{}) bool { // {{{1
+func isTrade(v *map[string]interface{}) bool { // {{{1
 	log.Println("Umf.isTrade", *v)
-/* An example of trade json {{{2
-map[
-  _links: map[
-    base: map[
-	    href: https://horizon.stellar.org/accounts/GDQ76…XYDUC
-	  ] 
-		counter: map[
-		  href: https://horizon.stellar.org/accounts/GB3LQ…JJMKO
-		]
-		operation: map[
-		  href: https://horizon.stellar.org/operations/109964094924283905
-		]
-		self: map[ href: ]
-	]
-	base_account: GDQ76…XYDUC
-	base_amount: 1.3481683
-	base_asset_code: CNY
-	base_asset_issuer:GAREE…3RFOX
-	base_asset_type: credit_alphanum4
-	base_is_seller: false
-	base_offer_id: 4721650113351671809
-	counter_account: GB3LQ…JJMKO
-	counter_amount: 2.9959295
-	counter_asset_type: native
-	counter_offer_id: 111904381
-	id: 109964094924283905-2
-	ledger_close_time: 2019-08-31T18:35:22Z
-	offer_id: 111904381
-	paging_token: 109964094924283905-2
-	price: map[d: 9 n: 20]
-]
-*/ // }}}2
+	/* An example of trade json {{{2
+	   map[
+	     _links: map[
+	       base: map[
+	   	    href: https://horizon.stellar.org/accounts/GDQ76ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
+	   	  ]
+	   		counter: map[
+	   		  href: https://horizon.stellar.org/accounts/GB3LQÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
+	   		]
+	   		operation: map[
+	   		  href: https://horizon.stellar.org/operations/109964094924283905
+	   		]
+	   		self: map[ href: ]
+	   	]
+	   	base_account: GDQ76ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
+	   	base_amount: 1.3481683
+	   	base_asset_code: CNY
+	   	base_asset_issuer:GAREEÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦3RFOX
+	   	base_asset_type: credit_alphanum4
+	   	base_is_seller: false
+	   	base_offer_id: 4721650113351671809
+	   	counter_account: GB3LQÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
+	   	counter_amount: 2.9959295
+	   	counter_asset_type: native
+	   	counter_offer_id: 111904381
+	   	id: 109964094924283905-2
+	   	ledger_close_time: 2019-08-31T18:35:22Z
+	   	offer_id: 111904381
+	   	paging_token: 109964094924283905-2
+	   	price: map[d: 9 n: 20]
+	   ]
+	*/ // }}}2
 	return (*v)["price"] != nil
 }
 
-func trade (v *map[string]interface{}) *Umf { // {{{1
-  return nil
+func trade(v *map[string]interface{}) *Umf { // {{{1
+	loc, _ := time.LoadLocation("UTC")
+	this := &Umf{
+		Asset:    (*v)["base_asset_code"].(string),
+		Exchange: "sdex", // TODO other exchanges
+		Trade:    tradeAsArray(v),
+		UTC:      time.Now().In(loc),
+	}
+	return this
 }
+
+// Presently, tradeAsArray returns: {{{1
+//
+// [
+//   base_amount,
+//   base_is_seller,
+//   base_offer_id,
+//   counter_amount,
+//   counter_offer_id,
+//   ledger_close_time,
+//   offer_id,
+//   priceInXLM
+// ]
+//
+// When done, there will be only two values in the resulting array: {{{2
+//
+// [ base_amount, priceInXLM ]
+//
+// where base_amount will be positive when the trade is a buy, and negative when
+// the trade is a sell. And
+//
+//     priceInXLM = price.n/price.d
+//
+// It is worth noting that
+//
+//     priceInXLM ~= counter_amount/base_amount
+//
+// I am doing this intermediate step to make sure I operate correctly with
+// base_is_seller, base_offer_id, counter_offer_id, and offer_id values. Before I
+// set up the rules, I would like to take a look at some use cases. }}}2
+func tradeAsArray(v *map[string]interface{}) []interface{} {
+	return nil
+}
+
 func ob(b []interface{}) OrderBook { // {{{1
 	c := make(OrderBook, len(b))
 	for i, v := range c {
