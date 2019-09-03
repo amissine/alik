@@ -8,7 +8,7 @@ SVC_D=/var/svc.d/$1
 
 install_service () { # {{{1
   if [ -L /service/$1 ]; then
-    cd /service/$1; rm /service/$1; svc -dx . log
+    cd /service/$1; rm /service/$1; svc -dx . log; sleep 1
     rm -rf $SVC_D
     echo "- service $1 removed"
     cd - > /dev/null

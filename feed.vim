@@ -232,12 +232,12 @@ normal! zo
 normal! zo
 30
 normal! zo
-let s:l = 24 - ((11 * winheight(0) + 6) / 12)
+let s:l = 11 - ((2 * winheight(0) + 6) / 12)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-24
-normal! 0
+11
+normal! 058|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -1010,18 +1010,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-5
+15
 normal! zo
-14
+48
 normal! zo
-33
+58
 normal! zo
-let s:l = 4 - ((3 * winheight(0) + 18) / 37)
+let s:l = 15 - ((14 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-4
-normal! 0
+15
+normal! 07|
 wincmd w
 exe '1resize ' . ((&lines * 1 + 24) / 48)
 exe '2resize ' . ((&lines * 1 + 24) / 48)
@@ -1167,7 +1167,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 1
-normal! 0
+normal! 011|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -1412,15 +1412,14 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 7 - ((6 * winheight(0) + 16) / 32)
+let s:l = 9 - ((8 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-7
+9
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
-3wincmd w
 exe '1resize ' . ((&lines * 6 + 24) / 48)
 exe '2resize ' . ((&lines * 5 + 24) / 48)
 exe '3resize ' . ((&lines * 32 + 24) / 48)
@@ -1731,24 +1730,24 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-9
-normal! zo
 25
 normal! zo
 29
 normal! zo
+25
+normal! zc
 46
 normal! zo
-83
+48
 normal! zo
-let s:l = 80 - ((78 * winheight(0) + 23) / 46)
+let s:l = 48 - ((47 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-80
-normal! 010|
+48
+normal! 0
 lcd ~/go/src/github.com/amissine/alik
-tabnext 3
+tabnext 5
 set stal=1
 if exists('s:wipebuf') && s:wipebuf != bufnr('%')
   silent exe 'bwipe ' . s:wipebuf
