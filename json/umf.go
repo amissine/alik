@@ -49,24 +49,24 @@ func isTrade(v *map[string]interface{}) bool { // {{{1
 	   map[
 	     _links: map[
 	       base: map[
-	   	    href: https://horizon.stellar.org/accounts/GDQ76ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
+	   	    href: https://horizon.stellar.org/accounts/GDQ76ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
 	   	  ]
 	   		counter: map[
-	   		  href: https://horizon.stellar.org/accounts/GB3LQÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
+	   		  href: https://horizon.stellar.org/accounts/GB3LQÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
 	   		]
 	   		operation: map[
 	   		  href: https://horizon.stellar.org/operations/109964094924283905
 	   		]
 	   		self: map[ href: ]
 	   	]
-	   	base_account: GDQ76ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
+	   	base_account: GDQ76ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦XYDUC
 	   	base_amount: 1.3481683
 	   	base_asset_code: CNY
-	   	base_asset_issuer:GAREEÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦3RFOX
+	   	base_asset_issuer:GAREEÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦3RFOX
 	   	base_asset_type: credit_alphanum4
 	   	base_is_seller: false
 	   	base_offer_id: 4721650113351671809
-	   	counter_account: GB3LQÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
+	   	counter_account: GB3LQÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¦JJMKO
 	   	counter_amount: 2.9959295
 	   	counter_asset_type: native
 	   	counter_offer_id: 111904381
@@ -121,7 +121,20 @@ func trade(v *map[string]interface{}) *Umf { // {{{1
 // base_is_seller, base_offer_id, counter_offer_id, and offer_id values. Before I
 // set up the rules, I would like to take a look at some use cases. }}}2
 func tradeAsArray(v *map[string]interface{}) []interface{} {
-	return nil
+	w := *v
+	price := w["price"].(map[string]interface{})
+	a := make([]interface{}, 8) // TODO replace 8 with 2
+	priceInXLM := price["n"].(float64) / price["d"].(float64)
+	return append(a,
+		w["base_amount"],
+		w["base_is_seller"],
+		w["base_offer_id"],
+		w["counter_amount"],
+		w["counter_offer_id"],
+		w["ledger_close_time"],
+		w["offer_id"],
+		priceInXLM,
+	)
 }
 
 func ob(b []interface{}) OrderBook { // {{{1
