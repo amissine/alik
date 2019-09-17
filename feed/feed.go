@@ -28,7 +28,8 @@ func main() { // {{{1
 			log.Println(os.Getpid(), "skipping", *q)
 			continue
 		}
-		if e := enc.Encode(&v); e != nil {
+		//if e := enc.Encode(&v); e != nil {
+		if e := enc.Encode(q); e != nil {
 			log.Println(os.Getpid(), "enc.Encode", e)
 			break
 		}

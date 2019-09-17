@@ -63,7 +63,7 @@ $(GOPATH)/bin/feed: feed/feed.go json/umf.go
 	@cd feed; go install; echo "- command feed installed in $(GOPATH)/bin"
 
 feed_up:
-	@sudo svstat /service/feed
+	@sudo svstat /service/feed; sudo tail -F $(Umf)
 
 #feed2telete: unzip_hmf feed_hmf {{{1
 #	@echo; echo "  Goals successful: $^"; echo
