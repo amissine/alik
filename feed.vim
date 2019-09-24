@@ -229,7 +229,7 @@ setlocal wrapmargin=0
 normal! zo
 54
 normal! zo
-let s:l = 66 - ((65 * winheight(0) + 23) / 47)
+let s:l = 66 - ((60 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -538,7 +538,7 @@ setlocal wrapmargin=0
 normal! zo
 15
 normal! zo
-let s:l = 3 - ((2 * winheight(0) + 23) / 47)
+let s:l = 3 - ((2 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -701,11 +701,13 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 136 - ((135 * winheight(0) + 23) / 46)
+152
+normal! zo
+let s:l = 152 - ((151 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-136
+152
 normal! 05|
 lcd ~/go/src/github.com/amissine/alik
 tabnext 4
