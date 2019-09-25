@@ -24,11 +24,10 @@ func main() { // {{{1
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if q = q.Init(&v); q.Skip() {
+		if q = q.Make(&v); q.Skip() {
 			log.Println(os.Getpid(), "skipping", *q)
 			continue
 		}
-		//if e := enc.Encode(&v); e != nil {
 		if e := enc.Encode(q); e != nil {
 			log.Println(os.Getpid(), "enc.Encode", e)
 			break
