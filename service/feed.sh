@@ -25,7 +25,7 @@ sdex () { # {{{1
     while true; do
       read || break
       curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
-      echo $REPLY
+      echo "$REPLY"
     done
   } | ./feed 'sdex' $ASSET 2>>./syserr
   log "sdex exiting with $?..."

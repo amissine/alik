@@ -13,7 +13,9 @@ import (
 // - https://golang.org/doc/code.html
 
 func main() { // {{{1
-	log.Println(os.Getpid(), os.Args[1], os.Args[2], "feed started")
+	exchange := os.Args[1]
+	asset := os.Args[2]
+	log.Println(os.Getpid(), exchange, asset, "feed started")
 	dec := json.NewDecoder(os.Stdin)
 	w := bufio.NewWriter(os.Stdout)
 	enc := json.NewEncoder(w)
@@ -24,8 +26,11 @@ func main() { // {{{1
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if q = q.Make(&v); q.Skip() {
-			log.Println(os.Getpid(), "skipping", *q)
+		if q = q.Make(exchange, asset, &v); q.Skip() {
+			//log.Println(os.Getpid(), "skipping", *q)
+			if !q.UTC.IsZero() {
+				q = nil
+			}
 			continue
 		}
 		if e := enc.Encode(q); e != nil {
@@ -33,6 +38,7 @@ func main() { // {{{1
 			break
 		}
 		w.Flush()
+		q = nil
 	}
 	log.Println(os.Getpid(), "feed exiting...")
 }
