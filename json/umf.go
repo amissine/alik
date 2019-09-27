@@ -42,7 +42,6 @@ func (this *Umf) Make(e, a string, v *map[string]interface{}) *Umf { // {{{1
 }
 
 func isTrade(exchange string, v *map[string]interface{}) bool { // {{{1
-	//log.Println("Umf.isTrade", *v)
 	return exchange == "sdex" && (*v)["price"] != nil // TODO other exchanges
 }
 
@@ -55,7 +54,6 @@ func trade(e, a string, v *map[string]interface{}, t *Umf) *Umf { // {{{1
 		Exchange: "sdex", // TODO other exchanges - use e arg value
 		Trade:    tradeAsArray(v),
 	}
-	//log.Println("trade this =", this)
 	return this
 }
 
@@ -135,7 +133,6 @@ func ob(b []interface{}) OrderBook { // {{{1
 
 func (this *Umf) Skip() bool { // {{{1
 	if this.UTC.IsZero() || this.Same(previous) {
-		//log.Println("Skip this =", this)
 		return true
 	}
 	previous = this

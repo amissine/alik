@@ -27,7 +27,6 @@ func main() { // {{{1
 			break
 		}
 		if q = q.Make(exchange, asset, &v); q.Skip() {
-			//log.Println(os.Getpid(), "skipping", *q)
 			if !q.UTC.IsZero() {
 				q = nil
 			}
