@@ -18,19 +18,13 @@ func main() { // {{{1
 	dec := json.NewDecoder(os.Stdin)
 	w := bufio.NewWriter(os.Stdout)
 	enc := json.NewEncoder(w)
-	var p, q *aj.Umf
 	for {
 		var v aj.Umf
 		if e := dec.Decode(&v); e != nil {
 			log.Println("dec.Decode", e)
 			break
 		}
-		if q = &v; q.Same(p) {
-			log.Println("skipping", *q)
-			continue
-		}
-		p = q
-		if e := enc.Encode(q); e != nil {
+		if e := enc.Encode(v); e != nil {
 			log.Println("enc.Encode", e)
 			break
 		}

@@ -46,18 +46,9 @@ for FEED in $FEEDS; do # {{{1
 done
 
 # Set traps and wait {{{1
-kill_pids () { # {{{2
-  pids=' '
-  while true; do
-    shift 2; if [ ! $? -eq 0 ]; then break; fi
-    pids="$pids $1"; shift 4
-  done
-  log "kill_pids: killing pids$pids..."
-  kill $pids
-}
 onSIGCONT () { # {{{2
   log received SIGCONT
-  cat ./syserr | grep 'feed started' | kill_pids $(cat)
+  cat ./syserr | grep 'feed started' | kill $(awk '{print $3}')
 } # }}}2
 
 trap "{ log received SIGTERM; }" SIGTERM

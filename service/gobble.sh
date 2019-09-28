@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/local/bin/bash
 
 pipe_in_from_remote_feed () {
   local ssh_client="$HOME/.ssh/client_session_$REMOTE_FEED"
@@ -18,24 +18,12 @@ if [ -n "$REMOTE_FEED" ]; then
   exit 0
 fi
 
-if [ -z "$UMF" ]; then # error
+if [ -z "$UMF" ]; then # error, empty file name
   exit 69
 fi
 
-kill_pids () {
-  pids=' '
-  while true; do
-    shift 2; if [ ! $? -eq 0 ]; then break; fi
-    pids="$pids $1"; shift 4
-  done
-  echo "- kill_pids: killing pids$pids..."
-  sudo kill $pids
-}
-kill_feeds () {
-  echo; echo '- shutting down /service/feed...'; sudo svc -d /service/feed
-  kill_pids $(cat)
-}
-trap "sudo cat /service/feed/syserr | grep 'feed started' | kill_feeds" SIGINT
-
-echo '- hit Ctrl-C to clean up and exit'; echo
-sudo -E tail -F $UMF
+{ cd /service/feed/log/main
+  cat <(ls | grep '.s' | xargs cat)
+  #echo "{\"current\":\"=============================================\"}"
+  cat $UMF 
+} | go run gobble/main.go # wc -l

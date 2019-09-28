@@ -10,8 +10,8 @@ SHELL := bash
 # Locals {{{1
 
 RECIPES = simulate trade order_s order_t \
-					gobble gobble_service_update gobble_up \
-					feed_service_update feed_up \
+					gobble_local gobble_service_update gobble_up \
+					feed feed_service_update feed_up \
 					feed_hmf unzip_hmf
 
 .PHONY: $(RECIPES)
@@ -24,8 +24,8 @@ Res_S = /service/simulate/log/main/current
 
 REMOTE_FEED = mia-hub
 
-# Default recipe: feed {{{1
-default_recipe: feed
+# Default recipe: gobble_local {{{1
+default_recipe: gobble_local
 
 # Run service simulate {{{1
 simulate: order_s
@@ -44,12 +44,12 @@ order_t: gobble
 	@service/order.sh $(Burp) $(Umf) $(Res_T)
 
 # Run service gobble {{{1
-#gobble: gobble_command_install gobble_service_update gobble_up feed
-#	@UMF=$(Umf) service/gobble.sh
+gobble_local:
+	@UMF=$(Umf) sudo -E service/gobble.sh
 
 # Run service gobble, pipe in from remote feed {{{1
-gobble: gobble_command_install gobble_service_update gobble_up
-	@REMOTE_FEED=$(REMOTE_FEED) service/gobble.sh
+#gobble: gobble_command_install gobble_service_update gobble_up
+#	@REMOTE_FEED=$(REMOTE_FEED) service/gobble.sh
 
 # Run service feed {{{1
 feed: feed_service_update feed_up
