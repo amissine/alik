@@ -1,8 +1,7 @@
 #!/usr/local/bin/bash
-echo 'bitfinex bitstamp gemini kraken sdex' > env/FEEDS
-echo 'BTCUSD CNYUSD ETHUSD XLMBTC XLMCNY XLMSLT XLMUSD XLMXRP XRPUSD' \
-  > env/TRADING_PAIRS
-#echo 'BTCUSD CNYUSD ETHUSD XLMXRP' > env/TRADING_PAIRS
+echo 'bitfinex coinbase kraken' > env/FEEDS
+echo 'BTCUSD ETHUSD XLMUSD XRPUSD' > env/TRADING_PAIRS
+echo 'BTCXLM CNYXLM ETHXLM SLTXLM USDXLM XRPXLM' > env/TRADING_PAIRS_SDEX
 
 . util/common.sh
 
