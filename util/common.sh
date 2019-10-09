@@ -1,5 +1,5 @@
-LOG_SIZE=s500000
-LOG_NUM=n22
+LOG_SIZE=s1000000
+LOG_NUM=n44
 
 log () { # {{{1
   echo `date +%s` $BASHPID $@ >>./syserr

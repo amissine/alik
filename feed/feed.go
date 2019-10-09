@@ -16,14 +16,14 @@ import (
 
 func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 	for _, feed := range strings.Fields(feeds) {
-		if feed == "kraken" { // TODO implement
+		if feed == "kraken" { // TODO implement {{{2
 			continue
 		}
+		a := asset
 		if feed == "coinbase" {
-			asset += "-"
+			a += "-"
 		}
-		tp := asset + "USD"
-		cmd := exec.Command("./feed.sh", feed, tp)
+		cmd := exec.Command("./feed.sh", feed, a+"USD")
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
 			log.Fatal("ERROR", err)
@@ -31,15 +31,19 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 		if err := cmd.Start(); err != nil {
 			log.Fatal(err)
 		}
-		var v map[string]interface{}
+		var v []interface{} // {{{2
 		if err := json.NewDecoder(stdout).Decode(&v); err != nil {
 			log.Fatal(err)
 		}
 		if err := cmd.Wait(); err != nil {
 			log.Fatal(err)
 		}
-		log.Println(os.Getpid(), "moreTrades", v)
-		if e := enc.Encode(&v); e != nil {
+
+		var q *aj.Umf // {{{2
+		if q = q.MakeTrade(feed, asset, &v); q.SkipTrade() {
+			continue
+		}
+		if e := enc.Encode(q); e != nil {
 			log.Println(os.Getpid(), "moreTrades", e)
 		}
 	}

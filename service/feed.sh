@@ -5,8 +5,17 @@
 
 # If called with arguments (feed, trading_pair), get the latest trades {{{1
 if [ $# -gt 0 ]; then
-  log $@
-  echo '{"Result":"Ok"}'
+  case $1 in
+    "bitfinex")
+      curl "https://api.bitfinex.com/v1/trades/$2?limit_trades=2"
+      ;;
+    "coinbase")
+      curl "https://api.pro.coinbase.com/products/$2/trades?limit=2"
+      ;;
+    *)
+      log TODO implement feed $1 # TODO implement feed $1
+      ;;
+  esac
   exit 0
 fi
 
