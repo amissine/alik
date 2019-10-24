@@ -2,6 +2,6 @@
 
 . util/common.sh
 
-REMOTE_FEED="mia-hub"
-pipe_in_from_remote_feed
-#pipe_in_from_current
+#pipe_in_from_remote_feed
+#pipe_in_from_remote_current
+pipe_in_from_local_current
