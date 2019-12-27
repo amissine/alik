@@ -34,14 +34,14 @@ sdex () { # {{{1
   local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
   local bat="$batp$ASSET&base_asset_issuer=$ai$bats"
 
-  log sdex $ASSET started
+  log sdex $ASSET started 
   while true; do
     curl -H "$ch" "$url/order_book?$bs&$asset" $cs | grep $gopts '{.*}$' || break
   done | {
     while true; do
       read || break
       curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
-      echo "$REPLY"
+      echo "$REPLY" | tee ./sdex${ASSET}.json
     done
   } | ./feed 'sdex' $ASSET "$FEEDS" "$TRADING_PAIRS" 2>>./syserr
   log "sdex exiting with $?..."

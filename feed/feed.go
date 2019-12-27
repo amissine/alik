@@ -71,8 +71,8 @@ func main() { // {{{1
 	feeds := os.Args[3]
 	tradingPairs := os.Args[4]
 	log.Println(os.Getpid(), asset, "sdex feed started")
-	dec := json.NewDecoder(os.Stdin)
-	w := bufio.NewWriter(os.Stdout)
+	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
+	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
 	var q *aj.Umf
 	for {

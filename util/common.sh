@@ -8,8 +8,9 @@ log () { # {{{1
 }
 
 pipe_in_from_local_current () { # {{{1
+  log 'pipe_in_from_local_current started'
   cd /service/feed/log/main
-  tail -n 99999 -F current
+  tail -n 999999 -F current
 }
 
 pipe_in_from_remote_current () { # {{{1
