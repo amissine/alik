@@ -65,12 +65,14 @@ func main() { // {{{1
 	feed := os.Args[1]
 	asset := os.Args[2]
 	if feed != "sdex" {
-		log.Println(os.Getpid(), asset, feed)
+		log.Println(os.Getpid(), asset, feed, "- must be sdex")
 		return
 	}
 	feeds := os.Args[3]
+	feeds = os.Getenv(feeds)
 	tradingPairs := os.Args[4]
-	log.Println(os.Getpid(), asset, "sdex feed started")
+	tradingPairs = os.Getenv(tradingPairs)
+	log.Println(os.Getpid(), feed, asset, "; feeds:", feeds, ", tradingPairs:", tradingPairs)
 	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)

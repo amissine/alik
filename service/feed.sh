@@ -43,7 +43,7 @@ sdex () { # {{{1
       curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
       echo "$REPLY" | tee ./sdex${ASSET}.json
     done
-  } | ./feed 'sdex' $ASSET "$FEEDS" "$TRADING_PAIRS" 2>>./syserr
+  } | ./feed 'sdex' $ASSET FEEDS TRADING_PAIRS 2>>./syserr
   log "sdex exiting with $?..."
 } 
 
