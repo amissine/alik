@@ -26,17 +26,17 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 		cmd := exec.Command("./feed.sh", feed, a+"USD")
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			log.Fatal("ERROR", err)
+			log.Fatal("moreTrades 1 ", err)
 		}
 		if err := cmd.Start(); err != nil {
-			log.Fatal(err)
+			log.Fatal("moreTrades 2 ", err)
 		}
 		var v []interface{} // {{{2
 		if err := json.NewDecoder(stdout).Decode(&v); err != nil {
-			log.Fatal(err)
+			log.Println(feed, " ", asset, " ", err)
 		}
 		if err := cmd.Wait(); err != nil {
-			log.Fatal(err)
+			log.Fatal("moreTrades 4 ", err)
 		}
 
 		var q *aj.Umf // {{{2
@@ -44,7 +44,7 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 			continue
 		}
 		if e := enc.Encode(q); e != nil {
-			log.Println(os.Getpid(), "moreTrades", e)
+			log.Println(os.Getpid(), "moreTrades 5 ", e)
 		}
 	}
 }
@@ -68,10 +68,8 @@ func main() { // {{{1
 		log.Println(os.Getpid(), asset, feed, "- must be sdex")
 		return
 	}
-	feeds := os.Args[3]
-	feeds = os.Getenv(feeds)
-	tradingPairs := os.Args[4]
-	tradingPairs = os.Getenv(tradingPairs)
+	feeds := os.Getenv("FEEDS")
+	tradingPairs := os.Getenv("TRADING_PAIRS")
 	log.Println(os.Getpid(), feed, asset, "; feeds:", feeds, ", tradingPairs:", tradingPairs)
 	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
 	w := bufio.NewWriterSize(os.Stdout, 65536)

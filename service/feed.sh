@@ -13,7 +13,7 @@ if [ $# -gt 0 ]; then
       curl "https://api.pro.coinbase.com/products/$2/trades?limit=2"
       ;;
     *)
-      log TODO implement feed $1 # TODO implement feed $1
+      log TODO implement feed $1 # TODO implement feed kraken
       ;;
   esac
   exit 0
@@ -41,9 +41,9 @@ sdex () { # {{{1
     while true; do
       read || break
       curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
-      echo "$REPLY" | tee ./sdex${ASSET}.json
+      echo "$REPLY"
     done
-  } | ./feed 'sdex' $ASSET FEEDS TRADING_PAIRS 2>>./syserr
+  } | ./feed 'sdex' $ASSET 2>>./syserr
   log "sdex exiting with $?..."
 } 
 
