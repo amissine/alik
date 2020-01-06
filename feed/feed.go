@@ -3,8 +3,11 @@ package main
 // import {{{1
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	aj "github.com/amissine/alik/json"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -24,19 +27,30 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 			a += "-"
 		}
 		cmd := exec.Command("./feed.sh", feed, a+"USD")
-		stdout, err := cmd.StdoutPipe()
+		pipe, err := cmd.StdoutPipe()
 		if err != nil {
 			log.Fatal("moreTrades 1 ", err)
 		}
 		if err := cmd.Start(); err != nil {
 			log.Fatal("moreTrades 2 ", err)
 		}
-		var v []interface{} // {{{2
-		if err := json.NewDecoder(stdout).Decode(&v); err != nil {
-			log.Println(feed, " ", asset, " ", err)
+		var v []interface{}
+		var buf bytes.Buffer
+		tee := io.TeeReader(bufio.NewReaderSize(pipe, 16384), &buf)
+		if err := json.NewDecoder(tee).Decode(&v); err != nil {
+			log.Println(feed, asset, err)
+			v = nil
+			b, e := ioutil.ReadAll(&buf)
+			if e != nil {
+				log.Fatal(e)
+			}
+			log.Printf("===\n%s\n===\n", b)
 		}
 		if err := cmd.Wait(); err != nil {
 			log.Fatal("moreTrades 4 ", err)
+		}
+		if v == nil {
+			continue
 		}
 
 		var q *aj.Umf // {{{2
