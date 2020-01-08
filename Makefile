@@ -45,7 +45,7 @@ order_t: gobble
 
 # Run service gobble locally {{{1
 gobble_local:
-	@UMF=$(Umf) sudo -E service/gobble.sh
+	@sudo -E service/gobble.sh
 
 # Run service gobble, pipe in from remote feed {{{1
 gobble_remote:

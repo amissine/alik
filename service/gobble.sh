@@ -9,13 +9,7 @@ if [ -n "$REMOTE_FEED" ]; then
   exit 0
 fi
 
-if [ -z "$UMF" ]; then # error, empty file name
-  exit 69
-fi
-
 { cd /service/feed/log/main
-  rm ./syserr; log cat logs
   cat <(ls | grep '.s' | xargs cat)
-  log cat UMF $UMF
-  cat $UMF 
+  tail -n 999999 -F current
 } | go run gobble/main.go 2>>./syserr
