@@ -24,8 +24,8 @@ Res_S = /service/simulate/log/main/current
 
 REMOTE_FEED = mia-hub
 
-# Default recipe: gobble_remote {{{1
-default_recipe: gobble_remote
+# Default recipe: gobble_local {{{1
+default_recipe: gobble_local
 
 # Run service simulate {{{1
 simulate: order_s

@@ -14,6 +14,8 @@ if [ -z "$UMF" ]; then # error, empty file name
 fi
 
 { cd /service/feed/log/main
+  rm ./syserr; log cat logs
   cat <(ls | grep '.s' | xargs cat)
+  log cat UMF $UMF
   cat $UMF 
-} | go run gobble/main.go # wc -l
+} | go run gobble/main.go 2>>./syserr

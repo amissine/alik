@@ -1,7 +1,6 @@
 # Locals {{{1
 LOG_SIZE=s1000000
 LOG_NUM=n44
-REMOTE_FEED="mia-hub"
 
 log () { # {{{1
   echo `date +%s` $BASHPID $@ >>./syserr
