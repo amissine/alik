@@ -34,6 +34,8 @@ sdex () { # {{{1
   local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
   local bat="$batp$ASSET&base_asset_issuer=$ai$bats"
 
+  # See also:
+  # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
   log sdex $ASSET started 
   while true; do
     curl -H "$ch" "$url/order_book?$bs&$asset" $cs | grep $gopts '{.*}$' || break
@@ -43,14 +45,14 @@ sdex () { # {{{1
       curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
       echo "$REPLY"
     done
-  } | ./feed 'sdex' $ASSET 2>>./syserr
+  } | ./feed $ASSET 2>>./syserr
   log "sdex exiting with $?..."
 } 
 
 # Set traps, start sdex processes, and wait {{{1
 onSIGCONT () { # {{{2
   log onSIGCONT received SIGCONT
-  cat ./syserr | grep 'sdex feed started' | kill $(awk '{print $3}')
+  cat ./syserr | grep "$SDEX_FEED_STARTED" | kill $(awk '{print $3}')
 } # }}}2
 
 trap "{ log received SIGTERM; }" SIGTERM

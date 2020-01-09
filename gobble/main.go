@@ -1,4 +1,6 @@
-package main
+package main // see also: {{{1
+// - https://golang.org/doc/code.html
+// - https://blog.golang.org/json-and-go
 
 // import {{{1
 import (
@@ -9,21 +11,16 @@ import (
 	"os"
 )
 
-// see also:
-// - https://golang.org/doc/code.html
-// - https://blog.golang.org/json-and-go
-
 // locals {{{1
 var (
-	prev         map[aj.AE][]interface{}  = make(map[aj.AE][]interface{})
 	pTrade4Asset map[string][]interface{} = make(map[string][]interface{})
 	sdexXMLinUSD float64
 )
 
 const (
 	UNDEF          = "???"
-	aLtEMA float64 = 0.02
-	aStEMA float64 = 0.1
+	aLtEMA float64 = 0.005
+	aStEMA float64 = 0.05
 )
 
 func main() { // {{{1
@@ -70,6 +67,7 @@ func noSignal4Asset(q *aj.Umf) bool { // {{{1
 	signal_returned := signal(pLtEMA, qLtEMA, pStEMA, qStEMA)
 	pTrade4Asset[q.Asset][0], pTrade4Asset[q.Asset][1] = qLtEMA, qStEMA
 	q.Trade = append(q.Trade, signal_returned)
+	q.AssumeTrade()
 	return signal_returned == UNDEF
 }
 

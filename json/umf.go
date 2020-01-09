@@ -30,8 +30,8 @@ type OrderBook []struct { // {{{1
 }
 
 func (this *Umf) Make(e, a string, v *map[string]interface{}) *Umf { // {{{1
-	if isTrade(e, v) {
-		return trade(e, a, v, this)
+	if sdexTrade(e, v) {
+		return sdexMakeTrade(e, a, v, this)
 	}
 	w := *v // Make Spread {{{2
 	asks, _ := w["asks"]
@@ -101,11 +101,11 @@ func parse(s string) float64 { // {{{1
 	return f
 }
 
-func isTrade(exchange string, v *map[string]interface{}) bool { // {{{1
-	return exchange == "sdex" && (*v)["price"] != nil // TODO other exchanges
+func sdexTrade(exchange string, v *map[string]interface{}) bool { // {{{1
+	return exchange == "sdex" && (*v)["price"] != nil
 }
 
-func trade(e, a string, v *map[string]interface{}, t *Umf) *Umf { // {{{1
+func sdexMakeTrade(e, a string, v *map[string]interface{}, t *Umf) *Umf { // {{{1
 	if t != nil { // TODO do not ignore previous trades
 		return t
 	}

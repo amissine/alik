@@ -76,15 +76,10 @@ func trades(asset, feeds, tradingPairs string, enc *json.Encoder) { // {{{1
 }
 
 func main() { // {{{1
-	feed := os.Args[1]
-	asset := os.Args[2]
-	if feed != "sdex" {
-		log.Println(os.Getpid(), asset, feed, "- must be sdex")
-		return
-	}
+	asset := os.Args[1]
 	feeds := os.Getenv("FEEDS")
 	tradingPairs := os.Getenv("TRADING_PAIRS")
-	log.Println(os.Getpid(), feed, asset, "; feeds:", feeds, ", tradingPairs:", tradingPairs)
+	log.Println(os.Getpid(), os.Getenv("SDEX_FEED_STARTED"), asset, "; feeds:", feeds, ", tradingPairs:", tradingPairs)
 	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
