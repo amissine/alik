@@ -36,7 +36,7 @@ sdex () { # {{{1
 
   # See also:
   # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
-  log sdex $ASSET started 
+  #
   while true; do
     curl -H "$ch" "$url/order_book?$bs&$asset" $cs | grep $gopts '{.*}$' || break
   done | {
@@ -51,11 +51,12 @@ sdex () { # {{{1
 
 # Set traps, start sdex processes, and wait {{{1
 onSIGCONT () { # {{{2
-  log onSIGCONT received SIGCONT
+  log 'received SIGCONT, killing feeds'
   cat ./syserr | grep "$SDEX_FEED_STARTED" | kill $(awk '{print $3}')
 } # }}}2
 
-trap "{ log received SIGTERM; }" SIGTERM
+# sudo svc -d /service/feed ==> SIGTERM, SIGCONT
+trap "{ log 'received SIGTERM'; }" SIGTERM
 trap onSIGCONT SIGCONT
 
 for TRADING_PAIR in $TRADING_PAIRS_SDEX; do

@@ -7,18 +7,17 @@ import (
 	"time"
 )
 
-type Umf struct { // {{{1
-	Asset, Exchange string
-	Ob              Spread
-	Trade           []interface{}
-	UTC             time.Time
+type UMF struct { // Unified Market Feed{{{1
+	AE   AE
+	Feed []interface{} // either [Spread] or tradeAsArray or tradeBitfinex...
+	UTC  time.Time
 }
 
 type AE struct { // {{{1
 	Asset, Exchange string
 }
 
-var pUmf = make(map[AE]*Umf)
+var pUMF = make(map[AE]*UMF)
 
 type Spread struct { // {{{1
 	Asks, Bids OrderBook
@@ -29,23 +28,25 @@ type OrderBook []struct { // {{{1
 	Price_r       struct{ D, N float64 }
 }
 
-func (this *Umf) Make(e, a string, v *map[string]interface{}) *Umf { // {{{1
-	if sdexTrade(e, v) {
-		return sdexMakeTrade(e, a, v, this)
+func (this *UMF) MakeSDEX(a string, v *map[string]interface{}) *UMF { // {{{1
+	if tradeSDEX(v) {
+		return makeTradeSDEX(a, v, this)
 	}
-	w := *v // Make Spread {{{2
+	w := *v
 	asks, _ := w["asks"]
 	bids, _ := w["bids"]
-	loc, _ := time.LoadLocation("UTC")
-	this.Ob = Spread{
-		Asks: ob(asks.([]interface{})),
-		Bids: ob(bids.([]interface{})),
+	feed := make([]interface{}, 1)
+	feed[0] = Spread{Asks: ob(asks.([]interface{})), Bids: ob(bids.([]interface{}))}
+	location, _ := time.LoadLocation("UTC")
+	this = &UMF{
+		AE:   AE{Asset: a, Exchange: "sdex"},
+		Feed: feed,
+		UTC:  time.Now().In(location),
 	}
-	this.UTC = time.Now().In(loc)
-	return this // }}}2
+	return this
 }
 
-func (this *Umf) MakeTrade(e, a string, v *[]interface{}) *Umf { // {{{1
+func (this *UMF) MakeTrade(e, a string, v *[]interface{}) *UMF { // {{{1
 	var trade []interface{}
 	loc, _ := time.LoadLocation("UTC")
 	switch e {
@@ -56,11 +57,10 @@ func (this *Umf) MakeTrade(e, a string, v *[]interface{}) *Umf { // {{{1
 	default:
 		panic("TODO implement trade") // TODO implement trade for e
 	}
-	return &Umf{
-		Asset:    a,
-		Exchange: e,
-		Trade:    trade,
-		UTC:      time.Now().In(loc),
+	return &UMF{
+		AE:   AE{Asset: a, Exchange: e},
+		Feed: trade,
+		UTC:  time.Now().In(loc),
 	}
 }
 
@@ -101,18 +101,19 @@ func parse(s string) float64 { // {{{1
 	return f
 }
 
-func sdexTrade(exchange string, v *map[string]interface{}) bool { // {{{1
-	return exchange == "sdex" && (*v)["price"] != nil
+func tradeSDEX(v *map[string]interface{}) bool { // {{{1
+	return (*v)["price"] != nil
 }
 
-func sdexMakeTrade(e, a string, v *map[string]interface{}, t *Umf) *Umf { // {{{1
+func makeTradeSDEX(a string, v *map[string]interface{}, t *UMF) *UMF { // {{{1
 	if t != nil { // TODO do not ignore previous trades
-		return t
+		return t // v represents a previous trade, we are ignoring it for now
 	}
-	this := &Umf{
-		Asset:    a,
-		Exchange: "sdex",
-		Trade:    tradeAsArray(v),
+	location, _ := time.LoadLocation("UTC")
+	this := &UMF{
+		AE:   AE{Asset: a, Exchange: "sdex"},
+		Feed: tradeAsArray(v),
+		UTC:  time.Now().In(location),
 	}
 	return this
 }
@@ -155,39 +156,45 @@ func ob(b []interface{}) OrderBook { // {{{1
 	return c
 }
 
-func (this *Umf) Skip() bool { // {{{1
-	if this.UTC.IsZero() || this.Same(pUmf[AE{this.Asset, this.Exchange}]) {
+func (this *UMF) SkipSDEX() bool { // {{{1
+	if this.Same(pUMF[this.AE]) {
 		return true
 	}
-	pUmf[AE{this.Asset, this.Exchange}] = this
+	pUMF[this.AE] = this
 	return false
 }
 
-func (this *Umf) SkipTrade() bool { // {{{1
-	if sameTrade(this, pUmf[AE{this.Asset, this.Exchange}]) {
+func (this *UMF) SkipTrade() bool { // {{{1
+	if this.SameTrade(pUMF[this.AE]) {
 		return true
 	}
-	pUmf[AE{this.Asset, this.Exchange}] = this
+	pUMF[this.AE] = this
 	return false
 }
 
-func sameTrade(this, mf *Umf) bool { // {{{1
-	if mf == nil {
+func (this *UMF) SameTrade(mf *UMF) bool { // {{{1
+	if mf == nil || len(this.Feed) < 3 || len(mf.Feed) < 3 {
 		return false
 	}
-	for i, e := range mf.Trade {
-		if this.Trade[i] != e {
+	for i, e := range mf.Feed {
+		if this.Feed[i] != e {
 			return false
 		}
 	}
 	return true
 }
 
-func (this *Umf) Same(mf *Umf) bool { // {{{1
-	if !sameTrade(this, mf) {
+func (this *UMF) IsTrade() bool { // {{{1
+	return len(this.Feed) > 2
+}
+func (this *UMF) Same(mf *UMF) bool { // {{{1
+	if this.IsTrade() && mf.IsTrade() {
+		return this.SameTrade(mf)
+	}
+	if this.IsTrade() || mf.IsTrade() {
 		return false
 	}
-	if this.Asset != mf.Asset || len(this.Ob.Asks) != len(mf.Ob.Asks) ||
+	if this.AE.Asset != mf.AE.Asset || len(this.Ob.Asks) != len(mf.Ob.Asks) ||
 		len(this.Ob.Bids) != len(mf.Ob.Bids) {
 		return false
 	}

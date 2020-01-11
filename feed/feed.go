@@ -83,17 +83,14 @@ func main() { // {{{1
 	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
-	var q *aj.Umf
+	var q *aj.UMF
 	for {
 		var v map[string]interface{}
 		if e := dec.Decode(&v); e != nil {
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if q = q.Make("sdex", asset, &v); q.Skip() {
-			if !q.UTC.IsZero() {
-				q = nil
-			}
+		if q = q.MakeSDEX(asset, &v); q.SkipSDEX() {
 			continue
 		}
 		trades(asset, feeds, tradingPairs, enc)
