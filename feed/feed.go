@@ -53,8 +53,8 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 			continue
 		}
 
-		var q *aj.Umf // {{{2
-		if q = q.MakeTrade(feed, asset, &v); q.SkipTrade() {
+		var q *aj.UMF // {{{2
+		if q = q.MakeTrade(feed, asset, &v); q.Skip() {
 			continue
 		}
 		if e := enc.Encode(q); e != nil {
@@ -63,12 +63,15 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 	}
 }
 
-func trades(asset, feeds, tradingPairs string, enc *json.Encoder) { // {{{1
+func trades(q *aj.UMF, asset, feeds, tp string, enc *json.Encoder) { // {{{1
+	if q.IsTrade() {
+		return
+	}
 	if asset == "USD" {
 		asset = "XLM"
 	}
-	for _, tp := range strings.Fields(tradingPairs) {
-		if strings.HasPrefix(tp, asset) {
+	for _, pair := range strings.Fields(tp) {
+		if strings.HasPrefix(pair, asset) {
 			moreTrades(asset, feeds, enc)
 			break
 		}
@@ -90,16 +93,16 @@ func main() { // {{{1
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if q = q.MakeSDEX(asset, &v); q.SkipSDEX() {
+		if q = q.MakeSDEX(asset, &v); q.Skip() {
+			trades(q, asset, feeds, tradingPairs, enc)
 			continue
 		}
-		trades(asset, feeds, tradingPairs, enc)
+		trades(q, asset, feeds, tradingPairs, enc)
 		if e := enc.Encode(q); e != nil {
 			log.Println(os.Getpid(), "enc.Encode", e)
 			break
 		}
 		w.Flush()
-		q = nil
 	}
 	log.Println(os.Getpid(), "feed exiting...")
 }
