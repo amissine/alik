@@ -17,7 +17,11 @@ type AE struct { // {{{1
 	Asset, Exchange string
 }
 
-var pUMF = make(map[AE][]*UMF) // {{{1
+type FeedHistory struct { // {{{1
+	AB, LT, OT *UMF // Asks and Bids (AB), Latest Trade (LT), Oldest Trade (OT)
+}
+
+var fhm = make(map[AE]FeedHistory)
 
 type OrderBook []struct { // {{{1
 	Amount, Price string
@@ -150,12 +154,35 @@ func ob(b []interface{}) OrderBook { // {{{1
 }
 
 func (this *UMF) Skip() bool { // {{{1
-	if pUMF[this.AE] == nil {
-		pUMF[this.AE] = make([]*UMF, 3) // Two last trades and one last order book
-		pUMF[this.AE][0] = this
-		return false
+	if fh, present := fhm[this.AE]; !present {
+		fhm[this.AE] = FeedHistory{LT: this}
+		return true
+	} else if this.IsTrade() {
+		if this.Same(fh.LT) {
+		} else {
+			if this.TradeBefore(fh.LT) { // latest SDEX trade comes first
+				if fh.OT == nil {
+					fh.OT = this
+				} else {
+				}
+			}
+		}
+	} else { // Asks and Bids
+		if this.Same(fh.AB) {
+			return true
+		}
 	}
 	return false
+}
+
+func (this *UMF) TradeBefore(mf *UMF) bool { // {{{1
+	if !this.IsTrade() {
+		panic("must be a trade")
+	}
+	loc, _ := time.LoadLocation("UTC")
+	t, _ := time.ParseInLocation(time.RFC3339, this.Feed[0].(string), loc)
+	f, _ := time.ParseInLocation(time.RFC3339, mf.Feed[0].(string), loc)
+	return t.Before(f)
 }
 
 func (this *UMF) SameTrade(mf *UMF) bool { // {{{1

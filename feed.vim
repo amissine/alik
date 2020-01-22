@@ -779,18 +779,24 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
+22
+normal! zo
 31
 normal! zo
-52
+41
 normal! zo
-53
+62
 normal! zo
-let s:l = 22 - ((21 * winheight(0) + 23) / 46)
+63
+normal! zo
+62
+normal! zc
+let s:l = 40 - ((39 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-22
-normal! 0
+40
+normal! 02|
 lcd ~/go/src/github.com/amissine/alik
 tabnext
 edit ~/go/src/github.com/amissine/alik/feed/feed.go
@@ -948,11 +954,15 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 78 - ((77 * winheight(0) + 23) / 46)
+66
+normal! zo
+81
+normal! zo
+let s:l = 108 - ((105 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-78
+108
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 tabnext
@@ -1111,21 +1121,23 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 144 - ((141 * winheight(0) + 23) / 46)
+178
+normal! zo
+let s:l = 185 - ((184 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-144
-normal! 01|
+185
+normal! 020|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 3
+tabnext 5
 set stal=1
 badd +1 ~/go/src/github.com/amissine/alik/Makefile
 badd +1 ~/go/src/github.com/amissine/alik/service/feed_run.sh
-badd +22 ~/go/src/github.com/amissine/alik/service/feed.sh
-badd +78 ~/go/src/github.com/amissine/alik/feed/feed.go
-badd +56 ~/go/src/github.com/amissine/alik/json/umf.go
-badd +41 ~/go/src/github.com/amissine/alik/util/common.sh
+badd +1 ~/go/src/github.com/amissine/alik/service/feed.sh
+badd +1 ~/go/src/github.com/amissine/alik/feed/feed.go
+badd +0 ~/go/src/github.com/amissine/alik/json/umf.go
+badd +1 ~/go/src/github.com/amissine/alik/util/common.sh
 badd +1 ~/go/src/github.com/amissine/alik/mf.sh
 badd +1 ~/go/src/github.com/amissine/alik/gobble/main.go
 badd +8 ~/go/src/github.com/amissine/alik/service/gobble.sh
@@ -1133,6 +1145,8 @@ badd +1 ~/go/src/github.com/amissine/alik/util/CNY.sh
 badd +1 ~/go/src/github.com/amissine/alik/util/SLT.sh
 badd +49 /usr/local/go/src/encoding/json/stream.go
 badd +9 ~/go/src/github.com/amissine/alik/service/update.sh
+badd +1 ~/go/src/github.com/amissine/alik/json/simsim.go
+badd +448 /usr/local/go/src/strings/strings.go
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -1144,6 +1158,7 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
+nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

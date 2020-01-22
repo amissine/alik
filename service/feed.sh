@@ -34,9 +34,10 @@ gopts='--line-buffered --only-matching' # grep opts
 # one bid (limit=1 below, local asset).
 #
 # Each order book update consists of one line (--line-buffered above) and triggers
-# another curl call that returns some latest trades of the asset for XLM. Presently,
-# two latest trades are being piped to the feed (limit=2 above, bat suffix bats).
-# Then we pipe the order book update (echo "$REPLY" below) to the feed.
+# another curl call that returns some latest trades of the asset for XLM in the
+# descending order. Presently, two latest trades are being piped to the feed, the 
+# latest one first (limit=2&order=desc above, bat suffix bats). Then we pipe the 
+# order book update (echo "$REPLY" below) to the feed.
 sdex () { # {{{1
   local ASSET=$1
   . util/$ASSET.sh # setting ai env var
