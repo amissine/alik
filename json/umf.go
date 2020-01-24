@@ -177,7 +177,26 @@ func (this *UMF) Skip() (bool, *UMF) { // {{{1
 	if added, mf := add2fhm(this); added {
 		return mf == nil || mf.IsTrade(), mf
 	}
-	return true, nil
+	fh, _ := fhm[this.AE] // present, not added
+	if this.IsTrade() {   // {{{2
+		if fh.LT.TradeBefore(this) {
+			fh.OT = fh.LT
+			fh.LT = this
+			return true, nil
+		} else {
+			if !this.SameTrade(fh.OT) {
+				fh.LT.Feed = append(fh.LT.Feed, false)
+			}
+			return false, fh.LT
+		}
+	} else { // Asks and Bids {{{2
+		if this.Same(fh.AB) {
+			return true, this
+		} else {
+			fh.AB = this
+			return false, this
+		}
+	} // }}}2
 }
 
 func (this *UMF) TradeBefore(mf *UMF) bool { // {{{1

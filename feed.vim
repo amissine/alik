@@ -1119,16 +1119,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-20
-normal! zo
 176
 normal! zo
-let s:l = 177 - ((176 * winheight(0) + 23) / 46)
+181
+normal! zo
+224
+normal! zo
+let s:l = 1 - ((0 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-177
-normal! 019|
+1
+normal! 0
 lcd ~/go/src/github.com/amissine/alik
 tabnext 5
 set stal=1
