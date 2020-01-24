@@ -18,10 +18,42 @@ type AE struct { // {{{1
 }
 
 type FeedHistory struct { // {{{1
-	AB, LT, OT *UMF // Asks and Bids (AB), Latest Trade (LT), Oldest Trade (OT)
+	LT, OT, AB *UMF // Latest Trade (LT), Oldest Trade (OT), Asks and Bids (AB)
 }
 
 var fhm = make(map[AE]FeedHistory)
+
+func add2fhm(mf *UMF) (bool, *UMF) {
+	var fh FeedHistory
+	var present bool
+	if fh, present = fhm[mf.AE]; !present { // {{{2
+		fhm[mf.AE] = FeedHistory{LT: mf}
+		return true, mf
+	}
+	if mf.IsTrade() { // {{{2
+		if mf.TradeBefore(fh.LT) { // Latest Trade comes first
+			if fh.OT == nil { // {{{3
+				fh.OT = mf
+				return true, nil
+			} else {
+				return false, nil
+			} // }}}3
+		} else {
+			if fh.OT == nil { // {{{3
+				panic("trade out of sequence")
+			} else {
+				return false, nil
+			} // }}}3
+		}
+	} else { // Asks and Bids {{{2
+		if fh.AB == nil {
+			fh.AB = mf
+			return true, mf
+		} else {
+			return false, nil
+		}
+	} // }}}2
+}
 
 type OrderBook []struct { // {{{1
 	Amount, Price string
@@ -30,25 +62,18 @@ type OrderBook []struct { // {{{1
 
 func (this *UMF) MakeSDEX(a string, v *map[string]interface{}) *UMF { // {{{1
 	if tradeSDEX(v) {
-		return makeTradeSDEX(a, v, this)
+		return newUMF(a, "sdex", tradeAsArray(v))
 	}
 	w := *v
 	asks, _ := w["asks"]
 	bids, _ := w["bids"]
 	feed := make([]interface{}, 2)
 	feed[0], feed[1] = ob(asks.([]interface{})), ob(bids.([]interface{}))
-	location, _ := time.LoadLocation("UTC")
-	this = &UMF{
-		AE:   AE{Asset: a, Exchange: "sdex"},
-		Feed: feed,
-		UTC:  time.Now().In(location),
-	}
-	return this
+	return newUMF(a, "sdex", feed)
 }
 
 func (this *UMF) MakeTrade(e, a string, v *[]interface{}) *UMF { // {{{1
 	var trade []interface{}
-	loc, _ := time.LoadLocation("UTC")
 	switch e {
 	case "bitfinex":
 		trade = tradeBitfinex(a, v)
@@ -57,11 +82,7 @@ func (this *UMF) MakeTrade(e, a string, v *[]interface{}) *UMF { // {{{1
 	default:
 		panic("TODO implement trade") // TODO implement trade for e
 	}
-	return &UMF{
-		AE:   AE{Asset: a, Exchange: e},
-		Feed: trade,
-		UTC:  time.Now().In(loc),
-	}
+	return newUMF(a, e, trade)
 }
 
 func tradeBitfinex(a string, v *[]interface{}) []interface{} { // {{{1
@@ -105,14 +126,13 @@ func tradeSDEX(v *map[string]interface{}) bool { // {{{1
 	return (*v)["price"] != nil
 }
 
-func makeTradeSDEX(a string, v *map[string]interface{}, t *UMF) *UMF { // {{{1
+func newUMF(a, e string, f []interface{}) *UMF { // {{{1
 	location, _ := time.LoadLocation("UTC")
-	this := &UMF{
-		AE:   AE{Asset: a, Exchange: "sdex"},
-		Feed: tradeAsArray(v),
+	return &UMF{
+		AE:   AE{Asset: a, Exchange: e},
+		Feed: f,
 		UTC:  time.Now().In(location),
 	}
-	return this
 }
 
 // Presently, tradeAsArray returns: {{{1
@@ -153,26 +173,11 @@ func ob(b []interface{}) OrderBook { // {{{1
 	return c
 }
 
-func (this *UMF) Skip() bool { // {{{1
-	if fh, present := fhm[this.AE]; !present {
-		fhm[this.AE] = FeedHistory{LT: this}
-		return true
-	} else if this.IsTrade() {
-		if this.Same(fh.LT) {
-		} else {
-			if this.TradeBefore(fh.LT) { // latest SDEX trade comes first
-				if fh.OT == nil {
-					fh.OT = this
-				} else {
-				}
-			}
-		}
-	} else { // Asks and Bids
-		if this.Same(fh.AB) {
-			return true
-		}
+func (this *UMF) Skip() (bool, *UMF) { // {{{1
+	if added, mf := add2fhm(this); added {
+		return mf == nil || mf.IsTrade(), mf
 	}
-	return false
+	return true, nil
 }
 
 func (this *UMF) TradeBefore(mf *UMF) bool { // {{{1

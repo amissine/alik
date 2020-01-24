@@ -796,7 +796,7 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 40
-normal! 02|
+normal! $
 lcd ~/go/src/github.com/amissine/alik
 tabnext
 edit ~/go/src/github.com/amissine/alik/feed/feed.go
@@ -954,15 +954,13 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-66
+82
 normal! zo
-81
-normal! zo
-let s:l = 108 - ((105 * winheight(0) + 23) / 46)
+let s:l = 81 - ((80 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-108
+81
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 tabnext
@@ -1121,14 +1119,16 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-178
+20
 normal! zo
-let s:l = 185 - ((184 * winheight(0) + 23) / 46)
+176
+normal! zo
+let s:l = 177 - ((176 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-185
-normal! 020|
+177
+normal! 019|
 lcd ~/go/src/github.com/amissine/alik
 tabnext 5
 set stal=1
@@ -1158,7 +1158,6 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

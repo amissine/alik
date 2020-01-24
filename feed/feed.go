@@ -54,7 +54,8 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 		}
 
 		var q *aj.UMF // {{{2
-		if q = q.MakeTrade(feed, asset, &v); q.Skip() {
+		var skip bool
+		if skip, q = q.MakeTrade(feed, asset, &v).Skip(); skip {
 			continue
 		}
 		if e := enc.Encode(q); e != nil {
@@ -64,7 +65,7 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 }
 
 func trades(q *aj.UMF, asset, feeds, tp string, enc *json.Encoder) { // {{{1
-	if q.IsTrade() {
+	if q == nil || q.IsTrade() {
 		return
 	}
 	if asset == "USD" {
@@ -87,13 +88,14 @@ func main() { // {{{1
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
 	var q *aj.UMF
+	var skip bool
 	for {
 		var v map[string]interface{}
 		if e := dec.Decode(&v); e != nil {
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if q = q.MakeSDEX(asset, &v); q.Skip() {
+		if skip, q = q.MakeSDEX(asset, &v).Skip(); skip {
 			trades(q, asset, feeds, tradingPairs, enc)
 			continue
 		}
