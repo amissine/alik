@@ -4,6 +4,10 @@
 . util/common.sh
 
 # If called with arguments (feed, trading_pair), get the latest trades {{{1
+# See also:
+#
+#   https://docs.google.com/document/d/1h5P9SaulgMFryKERavy7s5dIiI7incNpcCiUxKBPQaI
+#
 if [ $# -gt 0 ]; then
   case $1 in
     "bitfinex")

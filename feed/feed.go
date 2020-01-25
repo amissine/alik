@@ -33,11 +33,11 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 		}
 		if err := cmd.Start(); err != nil {
 			log.Fatal("moreTrades 2 ", err)
-		}
+		} // }}}2
 		var v []interface{}
 		var buf bytes.Buffer
 		tee := io.TeeReader(bufio.NewReaderSize(pipe, 16384), &buf)
-		if err := json.NewDecoder(tee).Decode(&v); err != nil {
+		if err := json.NewDecoder(tee).Decode(&v); err != nil { // {{{2
 			log.Println(feed, asset, err)
 			v = nil
 			b, e := ioutil.ReadAll(&buf)
@@ -49,17 +49,19 @@ func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
 		if err := cmd.Wait(); err != nil {
 			log.Fatal("moreTrades 4 ", err)
 		}
-		if v == nil {
+		if v == nil { // err != nil
 			continue
 		}
 
 		var q *aj.UMF // {{{2
 		var skip bool
-		if skip, q = q.MakeTrade(feed, asset, &v).Skip(); skip {
-			continue
-		}
-		if e := enc.Encode(q); e != nil {
-			log.Println(os.Getpid(), "moreTrades 5 ", e)
+		for _, trade := range v {
+			if skip, q = q.MakeTrade(feed, asset, trade.(map[string]interface{})).Skip(); skip {
+				continue
+			}
+			if e := enc.Encode(q); e != nil {
+				log.Println(os.Getpid(), "moreTrades 5 ", e)
+			}
 		}
 	}
 }

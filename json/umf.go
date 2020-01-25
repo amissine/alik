@@ -2,6 +2,7 @@ package json
 
 // import {{{1
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -24,35 +25,51 @@ type FeedHistory struct { // {{{1
 var fhm = make(map[AE]FeedHistory)
 
 func add2fhm(mf *UMF) (bool, *UMF) {
-	var fh FeedHistory
-	var present bool
-	if fh, present = fhm[mf.AE]; !present { // {{{2
-		fhm[mf.AE] = FeedHistory{LT: mf}
-		return true, mf
+	fh, present := fhm[mf.AE]
+	switch {
+	case !present:
+		return addedLT(mf)
+	case mf.IsTrade():
+		return fh.CheckOT(mf)
+	default:
+		return fh.CheckAB(mf)
 	}
-	if mf.IsTrade() { // {{{2
-		if mf.TradeBefore(fh.LT) { // Latest Trade comes first
-			if fh.OT == nil { // {{{3
-				fh.OT = mf
-				return true, nil
-			} else {
-				return false, nil
-			} // }}}3
-		} else {
-			if fh.OT == nil { // {{{3
-				panic("trade out of sequence")
-			} else {
-				return false, nil
-			} // }}}3
-		}
-	} else { // Asks and Bids {{{2
-		if fh.AB == nil {
-			fh.AB = mf
-			return true, mf
-		} else {
+}
+
+func (fh *FeedHistory) CheckOT(mf *UMF) (bool, *UMF) { // {{{2
+	switch {
+	case fh.LT.TradeBefore(mf):
+		switch {
+		case fh.OT == nil:
+			panic(fmt.Sprintf("trade fh.OT == nil; mf %+v\nfh.LT %+v", mf, fh.LT))
+		default:
 			return false, nil
 		}
-	} // }}}2
+	default:
+		switch {
+		case fh.OT == nil:
+			fh.OT = mf
+			return true, nil
+		default:
+			return false, nil
+		}
+	}
+}
+
+func (fh *FeedHistory) CheckAB(mf *UMF) (bool, *UMF) { // {{{2
+	switch {
+	case fh.AB == nil:
+		fh.AB = mf
+		return true, mf
+	default:
+		return false, nil
+	}
+}
+
+func addedLT(mf *UMF) (bool, *UMF) { // {{{2
+	fhm[mf.AE] = FeedHistory{LT: mf}
+	mf.Feed = append(mf.Feed, false)
+	return true, mf
 }
 
 type OrderBook []struct { // {{{1
@@ -72,7 +89,7 @@ func (this *UMF) MakeSDEX(a string, v *map[string]interface{}) *UMF { // {{{1
 	return newUMF(a, "sdex", feed)
 }
 
-func (this *UMF) MakeTrade(e, a string, v *[]interface{}) *UMF { // {{{1
+func (this *UMF) MakeTrade(e, a string, v map[string]interface{}) *UMF { // {{{1
 	var trade []interface{}
 	switch e {
 	case "bitfinex":
@@ -85,9 +102,8 @@ func (this *UMF) MakeTrade(e, a string, v *[]interface{}) *UMF { // {{{1
 	return newUMF(a, e, trade)
 }
 
-func tradeBitfinex(a string, v *[]interface{}) []interface{} { // {{{1
+func tradeBitfinex(a string, w map[string]interface{}) []interface{} { // {{{1
 	t := make([]interface{}, 3)
-	w := (*v)[0].(map[string]interface{})
 	amount := parse(w["amount"].(string))
 	loc, _ := time.LoadLocation("UTC")
 	t[0] = time.Unix(int64(w["timestamp"].(float64)), 0).In(loc)
@@ -100,11 +116,11 @@ func tradeBitfinex(a string, v *[]interface{}) []interface{} { // {{{1
 	return t
 }
 
-func tradeCoinbase(a string, v *[]interface{}) []interface{} { // {{{1
+func tradeCoinbase(a string, w map[string]interface{}) []interface{} { // {{{1
 	t := make([]interface{}, 3)
-	w := (*v)[0].(map[string]interface{})
 	size := parse(w["size"].(string))
-	t[0] = w["time"].(string)
+	loc, _ := time.LoadLocation("UTC")
+	t[0], _ = time.ParseInLocation(time.RFC3339, w["time"].(string), loc)
 	if w["side"].(string) == "sell" {
 		t[1] = size
 	} else {
@@ -151,7 +167,8 @@ func tradeAsArray(v *map[string]interface{}) []interface{} { // {{{1
 	base_amount := parse(w["base_amount"].(string))
 	a := make([]interface{}, 3)
 	priceInXLM := price["n"].(float64) / price["d"].(float64)
-	a[0] = w["ledger_close_time"]
+	loc, _ := time.LoadLocation("UTC")
+	a[0], _ = time.ParseInLocation(time.RFC3339, w["ledger_close_time"].(string), loc)
 	if w["base_is_seller"].(bool) {
 		a[1] = base_amount
 	} else {
@@ -174,8 +191,11 @@ func ob(b []interface{}) OrderBook { // {{{1
 }
 
 func (this *UMF) Skip() (bool, *UMF) { // {{{1
+	if this.IsTrade() && this.AE.Exchange != "sdex" {
+		log.Printf("%+v\n", this)
+	}
 	if added, mf := add2fhm(this); added {
-		return mf == nil || mf.IsTrade(), mf
+		return mf == nil, mf
 	}
 	fh, _ := fhm[this.AE] // present, not added
 	if this.IsTrade() {   // {{{2
@@ -203,10 +223,7 @@ func (this *UMF) TradeBefore(mf *UMF) bool { // {{{1
 	if !this.IsTrade() {
 		panic("must be a trade")
 	}
-	loc, _ := time.LoadLocation("UTC")
-	t, _ := time.ParseInLocation(time.RFC3339, this.Feed[0].(string), loc)
-	f, _ := time.ParseInLocation(time.RFC3339, mf.Feed[0].(string), loc)
-	return t.Before(f)
+	return this.Feed[0].(time.Time).Before(mf.Feed[0].(time.Time))
 }
 
 func (this *UMF) SameTrade(mf *UMF) bool { // {{{1
