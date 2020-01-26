@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-type UMF struct { // Unified Market Feed{{{1
+type UMF struct { // Unified Market Feed {{{1
 	AE   AE
 	Feed []interface{} // either [asks, bids] or tradeAsArray or tradeBitfinex...
 	UTC  time.Time
 }
 
-type AE struct { // {{{1
+type AE struct { // Asset, Exchange {{{1
 	Asset, Exchange string
 }
 
@@ -22,7 +22,7 @@ type FeedHistory struct { // {{{1
 	LT, OT, AB *UMF // Latest Trade (LT), Oldest Trade (OT), Asks and Bids (AB)
 }
 
-var fhm = make(map[AE]FeedHistory)
+var fhm = make(map[AE]*FeedHistory)
 
 func add2fhm(mf *UMF) (bool, *UMF) {
 	fh, present := fhm[mf.AE]
@@ -67,7 +67,7 @@ func (fh *FeedHistory) CheckAB(mf *UMF) (bool, *UMF) { // {{{2
 }
 
 func addedLT(mf *UMF) (bool, *UMF) { // {{{2
-	fhm[mf.AE] = FeedHistory{LT: mf}
+	fhm[mf.AE] = &FeedHistory{LT: mf}
 	mf.Feed = append(mf.Feed, false)
 	return true, mf
 }
@@ -191,9 +191,9 @@ func ob(b []interface{}) OrderBook { // {{{1
 }
 
 func (this *UMF) Skip() (bool, *UMF) { // {{{1
-	if this.IsTrade() && this.AE.Exchange != "sdex" {
-		log.Printf("%+v\n", this)
-	}
+	//if this.IsTrade() && this.AE.Exchange != "sdex" {
+	log.Printf("%+v\n", this)
+	//}
 	if added, mf := add2fhm(this); added {
 		return mf == nil, mf
 	}
@@ -230,12 +230,7 @@ func (this *UMF) SameTrade(mf *UMF) bool { // {{{1
 	if mf == nil || len(this.Feed) < 3 || len(mf.Feed) < 3 {
 		return false
 	}
-	for i, e := range mf.Feed {
-		if this.Feed[i] != e {
-			return false
-		}
-	}
-	return true
+	return this.Feed[0] == mf.Feed[0] && this.Feed[1] == mf.Feed[1] && this.Feed[2] == mf.Feed[2]
 }
 
 func (this *UMF) IsTrade() bool { // {{{1
