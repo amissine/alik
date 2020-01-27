@@ -191,21 +191,23 @@ func ob(b []interface{}) OrderBook { // {{{1
 }
 
 func (this *UMF) Skip() (bool, *UMF) { // {{{1
-	//if this.IsTrade() && this.AE.Exchange != "sdex" {
-	log.Printf("%+v\n", this)
-	//}
 	if added, mf := add2fhm(this); added {
 		return mf == nil, mf
 	}
 	fh, _ := fhm[this.AE] // present, not added
-	if this.IsTrade() {   // {{{2
+	log.Printf("%+v\n- fh.LT %+v\n- fh.OT %+v\n", *this, *fh.LT, *fh.OT)
+	if this.IsTrade() { // {{{2
+		if fh.LT.SameTrade(this) || fh.OT.SameTrade(this) {
+			return true, nil
+		}
 		if fh.LT.TradeBefore(this) {
 			fh.OT = fh.LT
 			fh.LT = this
 			return true, nil
 		} else {
-			if !this.SameTrade(fh.OT) {
+			if fh.OT.TradeBefore(this) || !this.SameTrade(fh.OT) {
 				fh.LT.Feed = append(fh.LT.Feed, false)
+				fh.OT = this
 			}
 			return false, fh.LT
 		}
