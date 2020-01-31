@@ -1,0 +1,26 @@
+{"bids":[{"price_r":{"n":149260,"d":1},"price":"149260.0000000","amount":"4.9852840"}],"asks":[{"price_r":{"n":157900,"d":1},"price":"157900.0000000","amount":"0.0000745"}],"base":{"asset_type":"credit_alphanum4","asset_code":"BTC","asset_issuer":"GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH"},"counter":{"asset_type":"native"}}
+{
+  "_links":{
+    "self":{"href":""},
+    "base":{"href":"https://horizon.stellar.org/accounts/GAG27SV4LAQTWCTLUYCB5XQ63VOG4NV6KIWMTRLBM2VWTLB74IIGNQ4T"},
+      "counter":{"href":"https://horizon.stellar.org/accounts/GCIQKUSTMMJDIYJJ36TDURBTQXC2LWYFGRZRNJHQLZQVVFNBSON3U2XH"},
+      "operation":{"href":"https://horizon.stellar.org/operations/120258147985162241"}
+  },
+  "id":"120258147985162241-3",
+  "paging_token":"120258147985162241-3",
+  "ledger_close_time":"2020-01-30T20:24:51Z",
+  "offer_id":"150759146",
+  "base_offer_id":"4731944166412550145",
+  "base_account":"GAG27SV4LAQTWCTLUYCB5XQ63VOG4NV6KIWMTRLBM2VWTLB74IIGNQ4T",
+  "base_amount":"0.0000005",
+  "base_asset_type":"credit_alphanum4",
+  "base_asset_code":"BTC",
+  "base_asset_issuer":"GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH",
+  "counter_offer_id":"150759146",
+  "counter_account":"GCIQKUSTMMJDIYJJ36TDURBTQXC2LWYFGRZRNJHQLZQVVFNBSON3U2XH",
+  "counter_amount":"0.0709020",
+  "counter_asset_type":"native",
+  "base_is_seller":false,
+  "price":{"n":154120,"d":1}
+}
+{"_links":{"self":{"href":""},"base":{"href":"https://horizon.stellar.org/accounts/GAG27SV4LAQTWCTLUYCB5XQ63VOG4NV6KIWMTRLBM2VWTLB74IIGNQ4T"},"counter":{"href":"https://horizon.stellar.org/accounts/GA4MLJBWNZUZKS2IDDIZ3NSE4N2TIJMG6GM4737Y4YFFIKFR2HWSBF3V"},"operation":{"href":"https://horizon.stellar.org/operations/120258147985162241"}},"id":"120258147985162241-2","paging_token":"120258147985162241-2","ledger_close_time":"2020-01-30T20:24:51Z","offer_id":"150798215","base_offer_id":"4731944166412550145","base_account":"GAG27SV4LAQTWCTLUYCB5XQ63VOG4NV6KIWMTRLBM2VWTLB74IIGNQ4T","base_amount":"0.0000324","base_asset_type":"credit_alphanum4","base_asset_code":"BTC","base_asset_issuer":"GATEMHCCKCY67ZUCKTROYN24ZYT5GK4EQZ65JJLDHKHRUZI3EUEKMTCH","counter_offer_id":"150798215","counter_account":"GA4MLJBWNZUZKS2IDDIZ3NSE4N2TIJMG6GM4737Y4YFFIKFR2HWSBF3V","counter_amount":"4.9980240","counter_asset_type":"native","base_is_seller":false,"price":{"n":154260,"d":1}}
