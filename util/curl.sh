@@ -3,7 +3,7 @@
 
 . util/common.sh
 
-# Locals for sdex_ob {{{1
+# Locals {{{1
 ch='Accept: text/event-stream' # curl header
 url='https://horizon.stellar.org'
 bs='buying_asset_type=native&selling_asset_type=credit_alphanum4'
@@ -45,22 +45,36 @@ sdex_t () { # {{{1
 
 bitfinex_t () { # {{{1
   local url="https://api-pub.bitfinex.com/v2/trades/t$1USD/hist"
+  local start
+  local json
 
   # See also:
   # - https://docs.bitfinex.com/reference#rest-public-trades
   #
   bitfinex_t_rate_ok || return 0
   if [ "$bitfinex_t_data" ]; then
-    bitfinex_t_data=$(curl $url$bitfinex_t_data $cs)
+    start=$bitfinex_t_data # milliseconds
+    bitfinex_t_data=$(curl $url?start=$start $cs)
   else
     bitfinex_t_data=$(curl $url $cs)
   fi
-  echo $bitfinex_t_data
-  bitfinex_t_data="${bitfinex_t_data#*\,}"
-  bitfinex_t_data="?start=${bitfinex_t_data%%\,*}"
+  json=$bitfinex_t_data
+  bitfinex_t_data=${bitfinex_t_data#*\,}
+  bitfinex_t_data=${bitfinex_t_data%%\,*}
+  echo $json
 }
 
 bitfinex_t_rate_ok () { # {{{1
   # Ratelimit: 30 req/min
-  return 0
+  if [ "$bitfinex_t_data" ]; then
+    if [ $SECONDS -ge 2 ]; then
+      SECONDS=0
+      return 0
+    else
+      return 1
+    fi
+  else
+    SECONDS=0
+    return 0
+  fi
 }
