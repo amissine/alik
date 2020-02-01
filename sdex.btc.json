@@ -3,8 +3,8 @@
   "_links":{
     "self":{"href":""},
     "base":{"href":"https://horizon.stellar.org/accounts/GAG27SV4LAQTWCTLUYCB5XQ63VOG4NV6KIWMTRLBM2VWTLB74IIGNQ4T"},
-      "counter":{"href":"https://horizon.stellar.org/accounts/GCIQKUSTMMJDIYJJ36TDURBTQXC2LWYFGRZRNJHQLZQVVFNBSON3U2XH"},
-      "operation":{"href":"https://horizon.stellar.org/operations/120258147985162241"}
+    "counter":{"href":"https://horizon.stellar.org/accounts/GCIQKUSTMMJDIYJJ36TDURBTQXC2LWYFGRZRNJHQLZQVVFNBSON3U2XH"},
+    "operation":{"href":"https://horizon.stellar.org/operations/120258147985162241"}
   },
   "id":"120258147985162241-3",
   "paging_token":"120258147985162241-3",

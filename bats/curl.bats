@@ -8,11 +8,6 @@
   [ "$result" -eq 4 ]
 }
 
-@test "addition using dc" { # {{{1
-  result="$(echo 2 2+p | dc)"
-  [ "$result" -eq 4 ]
-}
-
 @test "use the run helper" { # {{{1
   run echo $PWD
   [ "$status" -eq 0 ]
@@ -29,15 +24,9 @@
   [ -x ./util/curl.sh ]
 }
 
-@test "get BTC order book from SDEX" { # {{{1
-  . util/BTC.sh
-  sdex_ob BTC >> ./bats.log
-  [ "$LOG_NUM" = 'n44' ]
-}
-
-@test "get BTC trades from SDEX" { # {{{1
-  . util/BTC.sh
-  sdex_t BTC >> ./bats.log
+@test "get XRP trades from SDEX" { # {{{1
+  . util/XRP.sh
+  sdex_t XRP >> ./bats.log
   [ "$LOG_NUM" = 'n44' ]
 }
 

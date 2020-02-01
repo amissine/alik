@@ -32,16 +32,6 @@ bats='&counter_asset_type=native&limit=2&order=desc' # bat suffix
 cs='--silent --no-buffer' # curl suffix
 gopts='--line-buffered --only-matching' # grep opts
 
-# A separate process is started for each asset being traded on SDEX for XLM. {{{1
-# The process monitors the order book for the asset by calling curl. A call returns
-# one or more order book updates. Presently, an order book consists of one ask and
-# one bid (limit=1 below, local asset).
-#
-# Each order book update consists of one line (--line-buffered above) and triggers
-# another curl call that returns some latest trades of the asset for XLM in the
-# descending order. Presently, two latest trades are being piped to the feed, the 
-# latest one first (limit=2&order=desc above, bat suffix bats). Then we pipe the 
-# order book update (echo "$REPLY" below) to the feed.
 sdex () { # {{{1
   local ASSET=$1
   . util/$ASSET.sh # setting ai env var
