@@ -2,7 +2,7 @@
 
 set -e
 
-echo '=== get XRP order book and trades from SDEX ===' # {{{1
+echo '=== get XRP order book and trades ===' # {{{1
 . util/XRP.sh
 for i in 1 2; do
   sdex_ob XRP # || break

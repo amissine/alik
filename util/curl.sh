@@ -13,7 +13,7 @@ bats='&counter_asset_type=native&limit=1' # bat suffix
 cs='--silent --no-buffer' # curl suffix
 gopts='--line-buffered --only-matching' # grep opts
 
-# A separate process is started for each asset being traded for XLM on SDEX. {{{1
+# A separate process is started for each asset traded for XLM on SDEX. {{{1
 # The process monitors the order book for the asset by calling curl. A call returns
 # one or more order book updates. Presently, an order book consists of one ask and
 # one bid (limit=1 below, local asset).
@@ -50,6 +50,7 @@ bitfinex_t () { # {{{1
 
   # See also:
   # - https://docs.bitfinex.com/reference#rest-public-trades
+  # - https://gist.github.com/magnetikonline/90d6fe30fc247ef110a1
   #
   bitfinex_t_rate_ok || return 0
   if [ "$bitfinex_t_data" ]; then
@@ -60,21 +61,37 @@ bitfinex_t () { # {{{1
   fi
   json=$bitfinex_t_data
   bitfinex_t_data=${bitfinex_t_data#*\,}
-  bitfinex_t_data=${bitfinex_t_data%%\,*}
+  bitfinex_t_data=${bitfinex_t_data%%\,*} # next start, milliseconds
+  # echo "json              '$json'"
+  # echo "bitfinex_t_json_p '$bitfinex_t_json_p'"
+  if [ "$bitfinex_t_json_p" -a "$json" = "$bitfinex_t_json_p" ]; then return 0; fi
+  if [ "$start" ]; then
+    # echo $start
+    # echo $bitfinex_t_data
+    if [ "$start" = "$bitfinex_t_data" ]; then
+      bitfinex_t_json_p="$json"
+      return 0
+    fi
+    json=${json%%$start\,*}
+    json=${json%\,\[*}
+    json="${json}]" # duplicate trades removed
+    bitfinex_t_json_p="$json"
+  fi
   echo $json
 }
 
 bitfinex_t_rate_ok () { # {{{1
   # Ratelimit: 30 req/min
   if [ "$bitfinex_t_data" ]; then
-    if [ $SECONDS -ge 2 ]; then
-      SECONDS=0
+    let duration=$SECONDS-$bitfinex_t_p
+    if [ $duration -ge 2 ]; then
+      bitfinex_t_p=$SECONDS
       return 0
     else
       return 1
     fi
   else
-    SECONDS=0
+    bitfinex_t_p=$SECONDS
     return 0
   fi
 }
