@@ -48,11 +48,13 @@ bitfinex_t () { # {{{1
   local start
   local json
 
-  # See also:
+  # See also: {{{2
   # - https://docs.bitfinex.com/reference#rest-public-trades
   # - https://gist.github.com/magnetikonline/90d6fe30fc247ef110a1
   #
   bitfinex_t_rate_ok || return 0
+
+  # Call curl, set json and  next start. {{{2
   if [ "$bitfinex_t_data" ]; then
     start=$bitfinex_t_data # milliseconds
     bitfinex_t_data=$(curl $url?start=$start $cs)
@@ -62,12 +64,14 @@ bitfinex_t () { # {{{1
   json=$bitfinex_t_data
   bitfinex_t_data=${bitfinex_t_data#*\,}
   bitfinex_t_data=${bitfinex_t_data%%\,*} # next start, milliseconds
-  # echo "json              '$json'"
-  # echo "bitfinex_t_json_p '$bitfinex_t_json_p'"
+
+  # Remove duplicate trades. {{{2
+  #echo "json              '$json'"
+  #echo "bitfinex_t_json_p '$bitfinex_t_json_p'"
   if [ "$bitfinex_t_json_p" -a "$json" = "$bitfinex_t_json_p" ]; then return 0; fi
   if [ "$start" ]; then
-    # echo $start
-    # echo $bitfinex_t_data
+    #echo $start
+    #echo $bitfinex_t_data
     if [ "$start" = "$bitfinex_t_data" ]; then
       bitfinex_t_json_p="$json"
       return 0
@@ -77,7 +81,7 @@ bitfinex_t () { # {{{1
     json="${json}]" # duplicate trades removed
     bitfinex_t_json_p="$json"
   fi
-  echo $json
+  echo $json # }}}2
 }
 
 bitfinex_t_rate_ok () { # {{{1
@@ -92,6 +96,58 @@ bitfinex_t_rate_ok () { # {{{1
     fi
   else
     bitfinex_t_p=$SECONDS
+    return 0
+  fi
+}
+
+coinbase_t () { # {{{1
+  local url="https://api.pro.coinbase.com/products/$1-USD/trades"
+  local before
+  local json
+  local headers
+
+  # See also: {{{2
+  # - https://docs.pro.coinbase.com/#get-trades
+  # - https://docs.pro.coinbase.com/#pagination
+  #
+  coinbase_t_rate_ok || return 0
+
+  # Call curl, set json and next before. {{{2
+  if [ "$coinbase_t_data" ]; then
+    before=$coinbase_t_data # retrieving trades that are newer than before
+    coinbase_t_data="$(curl -i $url?before=$before $cs)"
+    #echo "- ? $?; coinbase_t_data '$coinbase_t_data'"
+  else
+    coinbase_t_data="$(curl -i $url $cs)"
+  fi
+  headers="${coinbase_t_data%\[*\]}"
+  let json_length=${#coinbase_t_data}-${#headers}
+  if [ $json_length -eq 2 ]; then
+    coinbase_t_data=$before
+    #echo "- json_length $json_length; coinbase_t_data '$coinbase_t_data'"
+    return 0
+  fi
+  json="${coinbase_t_data:${#headers}:$json_length}"
+  echo $json
+  coinbase_t_data=$(echo "$headers" | grep 'cb-before: ')
+  coinbase_t_data=${coinbase_t_data#cb-before: }
+  let coinbase_t_data_length=${#coinbase_t_data}-1
+  coinbase_t_data=${coinbase_t_data:0:$coinbase_t_data_length}
+}
+
+coinbase_t_rate_ok () { # {{{1
+  # We throttle public endpoints by IP: 3 requests per second, 
+  # up to 6 requests per second in bursts.
+  if [ "$coinbase_t_data" ]; then
+    let duration=$SECONDS-$coinbase_t_p
+    if [ $duration -ge 1 ]; then
+      coinbase_t_p=$SECONDS
+      return 0
+    else
+      return 1
+    fi
+  else
+    coinbase_t_p=$SECONDS
     return 0
   fi
 }
