@@ -9,7 +9,7 @@ for i in 1 2; do
 done | {
   while true; do
     read || break
-    for t in sdex_t bitfinex_t coinbase_t; do $t XRP; done
+    for t in sdex_t bitfinex_t coinbase_t kraken_t; do $t XRP; done
     echo "$REPLY"
   done
 }

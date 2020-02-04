@@ -122,7 +122,7 @@ coinbase_t () { # {{{1
   fi
   headers="${coinbase_t_data%\[*\]}"
   let json_length=${#coinbase_t_data}-${#headers}
-  if [ $json_length -eq 2 ]; then
+  if [ $json_length -eq 2 ]; then # no new trades
     coinbase_t_data=$before
     #echo "- json_length $json_length; coinbase_t_data '$coinbase_t_data'"
     return 0
@@ -132,9 +132,8 @@ coinbase_t () { # {{{1
   coinbase_t_data=$(echo "$headers" | grep 'cb-before: ')
   coinbase_t_data=${coinbase_t_data#cb-before: }
   let coinbase_t_data_length=${#coinbase_t_data}-1
-  coinbase_t_data=${coinbase_t_data:0:$coinbase_t_data_length}
+  coinbase_t_data=${coinbase_t_data:0:$coinbase_t_data_length} # }}}2
 }
-
 coinbase_t_rate_ok () { # {{{1
   # We throttle public endpoints by IP: 3 requests per second, 
   # up to 6 requests per second in bursts.
@@ -148,6 +147,47 @@ coinbase_t_rate_ok () { # {{{1
     fi
   else
     coinbase_t_p=$SECONDS
+    return 0
+  fi
+}
+
+kraken_t () { # {{{1
+  local url="https://api.kraken.com/0/public/Trades?pair=$1USD"
+  local last
+  local json
+
+  # See also: {{{2
+  # - https://support.kraken.com/hc/en-us/articles/360000919986-Public-endpoint-examples-you-can-try-them-directly-in-a-web-browser-
+  #
+  kraken_t_rate_ok || return 0
+
+  # Call curl, set json and next last. {{{2
+  if [ "$kraken_t_data" ]; then
+    last=$kraken_t_data # retrieving trades since the last one
+    kraken_t_data=$(curl $cs $url&since=$last)
+  else
+    kraken_t_data=$(curl $url $cs)
+  fi
+  json=$kraken_t_data
+  kraken_t_data=${kraken_t_data#*\"last\"\:\"}
+  kraken_t_data=${kraken_t_data%%\"*}
+  if [ "$kraken_t_data" = "$last" ]; then # no new trades
+    return 0
+  fi
+  echo $json
+}
+
+kraken_t_rate_ok () { # {{{1
+  if [ "$_krakent_data" ]; then
+    let duration=$SECONDS-$kraken_t_p
+    if [ $duration -ge 1 ]; then
+      kraken_t_p=$SECONDS
+      return 0
+    else
+      return 1
+    fi
+  else
+    kraken_t_p=$SECONDS
     return 0
   fi
 }
