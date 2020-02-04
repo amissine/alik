@@ -3,8 +3,34 @@
 
 . util/common.sh
 
+# If called with arguments (feed, trading_pair), get the latest trades {{{1
 # See also:
+#
 #   https://docs.google.com/document/d/1h5P9SaulgMFryKERavy7s5dIiI7incNpcCiUxKBPQaI
+#
+if [ $# -gt 0 ]; then
+  case $1 in
+    "bitfinex")
+      curl "https://api.bitfinex.com/v1/trades/$2?limit_trades=2"
+      ;;
+    "coinbase")
+      curl "https://api.pro.coinbase.com/products/$2/trades?limit=2"
+      ;;
+    *)
+      log TODO implement feed $1 # TODO implement feed kraken
+      ;;
+  esac
+  exit 0
+fi
+
+# Locals for sdex {{{1
+ch='Accept: text/event-stream' # curl header
+url='https://horizon.stellar.org'
+bs='buying_asset_type=native&selling_asset_type=credit_alphanum4'
+batp='base_asset_type=credit_alphanum4&base_asset_code=' # bat (see below) prefix
+bats='&counter_asset_type=native&limit=2&order=desc' # bat suffix
+cs='--silent --no-buffer' # curl suffix
+gopts='--line-buffered --only-matching' # grep opts
 
 sdex () { # {{{1
   local ASSET=$1

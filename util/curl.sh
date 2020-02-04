@@ -164,13 +164,15 @@ kraken_t () { # {{{1
   # Call curl, set json and next last. {{{2
   if [ "$kraken_t_data" ]; then
     last=$kraken_t_data # retrieving trades since the last one
-    kraken_t_data=$(curl $cs $url&since=$last)
+    #echo "- last          '$last'"
+    kraken_t_data=$(curl $url\&since=$last $cs)
   else
     kraken_t_data=$(curl $url $cs)
   fi
   json=$kraken_t_data
-  kraken_t_data=${kraken_t_data#*\"last\"\:\"}
-  kraken_t_data=${kraken_t_data%%\"*}
+  kraken_t_data=${kraken_t_data##*\"last\"\:\"}
+  #kraken_t_data=${kraken_t_data%%\"*}
+  echo "- kraken_t_data '$kraken_t_data'"
   if [ "$kraken_t_data" = "$last" ]; then # no new trades
     return 0
   fi
