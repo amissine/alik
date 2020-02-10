@@ -6,12 +6,13 @@
 # Locals {{{1
 ch='Accept: text/event-stream' # curl header
 url='https://horizon.stellar.org'
-bs='buying_asset_type=native&selling_asset_type=credit_alphanum4'
+bs='buying_asset_type=native&selling_asset_type=credit_alphanum4&cursor=now'
 batp='base_asset_type=credit_alphanum4&base_asset_code=' # bat (see below) prefix
-#bats='&counter_asset_type=native&limit=2&order=desc' # bat suffix
-bats='&counter_asset_type=native&limit=1' # bat suffix
+bats='&counter_asset_type=native&limit=1&order=desc' # bat suffix
 cs='--silent --no-buffer' # curl suffix
 gopts='--line-buffered --only-matching' # grep opts
+gfilter='\"counter_asset_type\":\"native\"' # preventing trades with
+# "counter_asset_code":"JPY" from showing up (a bug in SDK?)
 
 # A separate process is started for each asset traded for XLM on SDEX. {{{1
 # The process monitors the order book for the asset by calling curl. A call returns
@@ -28,19 +29,22 @@ gopts='--line-buffered --only-matching' # grep opts
 sdex_ob () { # {{{1
   local ASSET=$1
   local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
+  local URL="$url/order_book?$bs&$asset"
 
   # See also:
   # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
   #
-  curl -H "$ch" "$url/order_book?$bs&$asset" $cs | grep $gopts '{.*}$'
+  curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$'
 } 
 
 sdex_t () { # {{{1
   local ASSET=$1
   local bat="$batp$ASSET&base_asset_issuer=$ai$bats"
+  local URL="$url/trades?$bat"
+  local q
   
-  sdex_t_q=$(curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$')
-  [ "$sdex_t_q" = "$sdex_t_p" ] || { sdex_t_p="$sdex_t_q"; echo "$sdex_t_q"; }
+  q=$(curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$')
+  [ "$q" = "$sdex_t_p" ] || { sdex_t_p="$q"; echo "$q"; }
 }
 
 bitfinex_t () { # {{{1
@@ -57,9 +61,9 @@ bitfinex_t () { # {{{1
   # Call curl, set json and  next start. {{{2
   if [ "$bitfinex_t_data" ]; then
     start=$bitfinex_t_data # milliseconds
-    bitfinex_t_data=$(curl $url?start=$start $cs)
+    bitfinex_t_data=$(curl "$url?start=$start" $cs)
   else
-    bitfinex_t_data=$(curl $url $cs)
+    bitfinex_t_data=$(curl "$url" $cs)
   fi
   json=$bitfinex_t_data
   bitfinex_t_data=${bitfinex_t_data#*\,}
@@ -115,10 +119,10 @@ coinbase_t () { # {{{1
   # Call curl, set json and next before. {{{2
   if [ "$coinbase_t_data" ]; then
     before=$coinbase_t_data # retrieving trades that are newer than before
-    coinbase_t_data="$(curl -i $url?before=$before $cs)"
+    coinbase_t_data="$(curl -i "$url?before=$before" $cs)"
     #echo "- ? $?; coinbase_t_data '$coinbase_t_data'"
   else
-    coinbase_t_data="$(curl -i $url $cs)"
+    coinbase_t_data="$(curl -i "$url" $cs)"
   fi
   headers="${coinbase_t_data%\[*\]}"
   let json_length=${#coinbase_t_data}-${#headers}
@@ -165,14 +169,14 @@ kraken_t () { # {{{1
   if [ "$kraken_t_data" ]; then
     last=$kraken_t_data # retrieving trades since the last one
     #echo "- last          '$last'"
-    kraken_t_data=$(curl $url\&since=$last $cs)
+    kraken_t_data=$(curl "$url&since=$last" $cs)
   else
-    kraken_t_data=$(curl $url $cs)
+    kraken_t_data=$(curl "$url" $cs)
   fi
   json=$kraken_t_data
   kraken_t_data=${kraken_t_data##*\"last\"\:\"}
-  #kraken_t_data=${kraken_t_data%%\"*}
-  echo "- kraken_t_data '$kraken_t_data'"
+  kraken_t_data=${kraken_t_data%%\"*}
+  #echo "- kraken_t_data '$kraken_t_data'"
   if [ "$kraken_t_data" = "$last" ]; then # no new trades
     return 0
   fi

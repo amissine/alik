@@ -81,7 +81,7 @@ func trades(q *aj.UMF, asset, feeds, tp string, enc *json.Encoder) { // {{{1
 	}
 }
 
-func main() { // {{{1
+/*func main() { // {{{1
 	asset := os.Args[1]
 	feeds := os.Getenv("FEEDS")
 	tradingPairs := os.Getenv("TRADING_PAIRS")
@@ -110,3 +110,4 @@ func main() { // {{{1
 	}
 	log.Println(os.Getpid(), "feed exiting...")
 }
+*/

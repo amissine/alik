@@ -6,25 +6,33 @@
 # See also:
 #   https://docs.google.com/document/d/1h5P9SaulgMFryKERavy7s5dIiI7incNpcCiUxKBPQaI
 
+set -e # TODO remove when done debugging
 sdex () { # {{{1
+  local asset
   local ASSET=$1
-  . util/$ASSET.sh # setting ai env var
-  local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
-  local bat="$batp$ASSET&base_asset_issuer=$ai$bats"
+  local p
+  local q
+  . util/$ASSET.sh
 
-  # See also:
-  # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
-  #
+  log "sdex $ASSET started"
   while true; do
-    curl -H "$ch" "$url/order_book?$bs&$asset" $cs | grep $gopts '{.*}$' || break
+    sdex_ob $ASSET | ./feed $ASSET "sdex_ob" || break
   done | {
     while true; do
-      read || break
-      curl -H "$ch" "$url/trades?$bat" $cs | grep $gopts '{.*}$'
-      echo "$REPLY"
+      read; q="$REPLY"
+      for t in sdex_t bitfinex_t coinbase_t kraken_t; do
+        asset=$ASSET
+        [ "$t" != 'sdex_t' -a "$asset" = 'CNY' ] && continue
+        [ "$t" != 'sdex_t' -a "$asset" = 'SLT' ] && continue
+        if [ "$t" = 'kraken_t' -a "$asset" = 'BTC' ]; then asset='XBT'
+        elif [ "$t" != 'sdex_t' -a "$asset" = 'USD' ]; then asset='XLM'; fi
+        $t $asset | ./feed $asset "$t"
+      done
+      [ "$p" = "$q" ] && continue
+      p="$q"; echo "$q"
     done
-  } | ./feed $ASSET 2>>./syserr
-  log "sdex exiting with $?..."
+  } 2>>./syserr
+  log "sdex $ASSET exiting with $?"
 } 
 
 # Set traps, start sdex processes, and wait {{{1
@@ -39,6 +47,7 @@ trap onSIGCONT SIGCONT
 
 for TRADING_PAIR in $TRADING_PAIRS_SDEX; do
   sdex ${TRADING_PAIR:0:3} &
+  log "sdex ${TRADING_PAIR:0:3} pid $! started"
 done
 
 wait

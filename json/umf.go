@@ -2,11 +2,23 @@ package json
 
 // import {{{1
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 )
+
+var w = bufio.NewWriterSize(os.Stdout, 65536) // {{{1
+var enc = json.NewEncoder(w)
+
+func encodeUMF(q *UMF) {
+	if err := enc.Encode(q); err != nil {
+		log.Fatal(os.Getpid(), "encodeUMF", err)
+	}
+}
 
 type UMF struct { // Unified Market Feed {{{1
 	AE   AE
@@ -93,7 +105,7 @@ func (this *UMF) MakeTrade(e, a string, v map[string]interface{}) *UMF { // {{{1
 	var trade []interface{}
 	switch e {
 	case "bitfinex":
-		trade = tradeBitfinex(a, v)
+		//		trade = tradeBitfinex(a, v)
 	case "coinbase":
 		trade = tradeCoinbase(a, v)
 	default:
@@ -102,17 +114,15 @@ func (this *UMF) MakeTrade(e, a string, v map[string]interface{}) *UMF { // {{{1
 	return newUMF(a, e, trade)
 }
 
-func tradeBitfinex(a string, w map[string]interface{}) []interface{} { // {{{1
+func tradeBitfinex(a string, w []interface{}) []interface{} { // {{{1
 	t := make([]interface{}, 3)
-	amount := parse(w["amount"].(string))
+	mts := int64(w[1].(float64)) // millisecond time stamp
+	sec := mts / 1000
+	nsec := mts % 1000 * 1000000
 	loc, _ := time.LoadLocation("UTC")
-	t[0] = time.Unix(int64(w["timestamp"].(float64)), 0).In(loc)
-	if w["type"].(string) == "buy" {
-		t[1] = amount
-	} else {
-		t[1] = -amount
-	}
-	t[2] = parse(w["price"].(string)) // price in USD
+	t[0] = time.Unix(sec, nsec).In(loc)
+	t[1] = w[2].(float64)
+	t[2] = w[3].(float64) // price in USD
 	return t
 }
 
@@ -237,6 +247,38 @@ func (this *UMF) SameTrade(mf *UMF) bool { // {{{1
 
 func (this *UMF) IsTrade() bool { // {{{1
 	return len(this.Feed) > 2
+}
+
+func SdexOrderbookToUMF(asset string, p *map[string]interface{}) { // {{{1
+	v := *p
+	asks, _ := v["asks"]
+	bids, _ := v["bids"]
+	feed := make([]interface{}, 2)
+	feed[0], feed[1] = ob(asks.([]interface{})), ob(bids.([]interface{}))
+	encodeUMF(newUMF(asset, "sdex", feed))
+	w.Flush()
+}
+
+func SdexTradeToUMF(asset string, p *map[string]interface{}) { // {{{1
+	encodeUMF(newUMF(asset, "sdex", tradeAsArray(p)))
+	w.Flush()
+}
+
+func BitfinexTradesToUMF(asset string, p *[]interface{}) { // {{{1
+	for _, trade := range *p {
+		encodeUMF(newUMF(asset, "bitfinex", tradeBitfinex(asset, trade.([]interface{}))))
+	}
+	w.Flush()
+}
+
+func CoinbaseTradesToUMF(asset string, p *[]interface{}) { // {{{1
+	for _, trade := range *p {
+		encodeUMF(newUMF(asset, "coinbase", tradeCoinbase(asset, trade.(map[string]interface{}))))
+	}
+	w.Flush()
+}
+
+func KrakenTradesToUMF(asset string, v *map[string]interface{}) { // {{{1
 }
 func (this *UMF) Same(mf *UMF) bool { // {{{1
 	if this.IsTrade() && mf.IsTrade() {
