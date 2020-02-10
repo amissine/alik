@@ -4,7 +4,6 @@ package json
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -30,88 +29,9 @@ type AE struct { // Asset, Exchange {{{1
 	Asset, Exchange string
 }
 
-type FeedHistory struct { // {{{1
-	LT, OT, AB *UMF // Latest Trade (LT), Oldest Trade (OT), Asks and Bids (AB)
-}
-
-var fhm = make(map[AE]*FeedHistory)
-
-func add2fhm(mf *UMF) (bool, *UMF) {
-	fh, present := fhm[mf.AE]
-	switch {
-	case !present:
-		return addedLT(mf)
-	case mf.IsTrade():
-		return fh.CheckOT(mf)
-	default:
-		return fh.CheckAB(mf)
-	}
-}
-
-func (fh *FeedHistory) CheckOT(mf *UMF) (bool, *UMF) { // {{{2
-	switch {
-	case fh.LT.TradeBefore(mf):
-		switch {
-		case fh.OT == nil:
-			panic(fmt.Sprintf("trade fh.OT == nil; mf %+v\nfh.LT %+v", mf, fh.LT))
-		default:
-			return false, nil
-		}
-	default:
-		switch {
-		case fh.OT == nil:
-			fh.OT = mf
-			return true, nil
-		default:
-			return false, nil
-		}
-	}
-}
-
-func (fh *FeedHistory) CheckAB(mf *UMF) (bool, *UMF) { // {{{2
-	switch {
-	case fh.AB == nil:
-		fh.AB = mf
-		return true, mf
-	default:
-		return false, nil
-	}
-}
-
-func addedLT(mf *UMF) (bool, *UMF) { // {{{2
-	fhm[mf.AE] = &FeedHistory{LT: mf}
-	mf.Feed = append(mf.Feed, false)
-	return true, mf
-}
-
 type OrderBook []struct { // {{{1
 	Amount, Price string
 	Price_r       struct{ D, N float64 }
-}
-
-func (this *UMF) MakeSDEX(a string, v *map[string]interface{}) *UMF { // {{{1
-	if tradeSDEX(v) {
-		return newUMF(a, "sdex", tradeAsArray(v))
-	}
-	w := *v
-	asks, _ := w["asks"]
-	bids, _ := w["bids"]
-	feed := make([]interface{}, 2)
-	feed[0], feed[1] = ob(asks.([]interface{})), ob(bids.([]interface{}))
-	return newUMF(a, "sdex", feed)
-}
-
-func (this *UMF) MakeTrade(e, a string, v map[string]interface{}) *UMF { // {{{1
-	var trade []interface{}
-	switch e {
-	case "bitfinex":
-		//		trade = tradeBitfinex(a, v)
-	case "coinbase":
-		trade = tradeCoinbase(a, v)
-	default:
-		panic("TODO implement trade") // TODO implement trade for e
-	}
-	return newUMF(a, e, trade)
 }
 
 func tradeBitfinex(a string, w []interface{}) []interface{} { // {{{1
@@ -140,16 +60,27 @@ func tradeCoinbase(a string, w map[string]interface{}) []interface{} { // {{{1
 	return t
 }
 
+func tradeKraken(a string, w []interface{}) []interface{} { // {{{1
+	t := make([]interface{}, 3)
+	ts := w[2].(float64)
+	sec := int64(ts)
+	nsec := int64(1000000000 * (ts - float64(sec)))
+	loc, _ := time.LoadLocation("UTC")
+	t[0] = time.Unix(sec, nsec).In(loc)
+	amount := parse(w[1].(string))
+	if w[3].(string) == "s" {
+		amount = -amount
+	}
+	t[1] = amount
+	t[2] = parse(w[0].(string)) // price in USD
+	return t
+}
 func parse(s string) float64 { // {{{1
 	f, e := strconv.ParseFloat(s, 64)
 	if e != nil {
 		log.Println("parse ERROR", e)
 	}
 	return f
-}
-
-func tradeSDEX(v *map[string]interface{}) bool { // {{{1
-	return (*v)["price"] != nil
 }
 
 func newUMF(a, e string, f []interface{}) *UMF { // {{{1
@@ -166,11 +97,7 @@ func newUMF(a, e string, f []interface{}) *UMF { // {{{1
 // [ ledger_close_time, base_amount, priceInXLM ]
 //
 // where base_amount will be positive when the trade is a buy, and negative when
-// the trade is a sell. Occasionally, the fourth element may be present in this
-// array. When its value is false, this means the trade is not sequential. In other
-// words, trade loss is possible between this trade and the previous trade in the
-// market feed sequence.
-// }}}1
+// the trade is a sell. }}}1
 func tradeAsArray(v *map[string]interface{}) []interface{} { // {{{1
 	w := *v
 	price := w["price"].(map[string]interface{})
@@ -198,55 +125,6 @@ func ob(b []interface{}) OrderBook { // {{{1
 		c[i] = v
 	}
 	return c
-}
-
-func (this *UMF) Skip() (bool, *UMF) { // {{{1
-	if added, mf := add2fhm(this); added {
-		return mf == nil, mf
-	}
-	fh, _ := fhm[this.AE] // present, not added
-	log.Printf("%+v\n- fh.LT %+v\n- fh.OT %+v\n", *this, *fh.LT, *fh.OT)
-	if this.IsTrade() { // {{{2
-		if fh.LT.SameTrade(this) || fh.OT.SameTrade(this) {
-			return true, nil
-		}
-		if fh.LT.TradeBefore(this) {
-			fh.OT = fh.LT
-			fh.LT = this
-			return true, nil
-		} else {
-			if fh.OT.TradeBefore(this) || !this.SameTrade(fh.OT) {
-				fh.LT.Feed = append(fh.LT.Feed, false)
-				fh.OT = this
-			}
-			return false, fh.LT
-		}
-	} else { // Asks and Bids {{{2
-		if this.Same(fh.AB) {
-			return true, this
-		} else {
-			fh.AB = this
-			return false, this
-		}
-	} // }}}2
-}
-
-func (this *UMF) TradeBefore(mf *UMF) bool { // {{{1
-	if !this.IsTrade() {
-		panic("must be a trade")
-	}
-	return this.Feed[0].(time.Time).Before(mf.Feed[0].(time.Time))
-}
-
-func (this *UMF) SameTrade(mf *UMF) bool { // {{{1
-	if mf == nil || len(this.Feed) < 3 || len(mf.Feed) < 3 {
-		return false
-	}
-	return this.Feed[0] == mf.Feed[0] && this.Feed[1] == mf.Feed[1] && this.Feed[2] == mf.Feed[2]
-}
-
-func (this *UMF) IsTrade() bool { // {{{1
-	return len(this.Feed) > 2
 }
 
 func SdexOrderbookToUMF(asset string, p *map[string]interface{}) { // {{{1
@@ -278,31 +156,21 @@ func CoinbaseTradesToUMF(asset string, p *[]interface{}) { // {{{1
 	w.Flush()
 }
 
-func KrakenTradesToUMF(asset string, v *map[string]interface{}) { // {{{1
-}
-func (this *UMF) Same(mf *UMF) bool { // {{{1
-	if this.IsTrade() && mf.IsTrade() {
-		return this.SameTrade(mf)
+func KrakenTradesToUMF(asset string, p *map[string]interface{}) { // {{{1
+	v := *p
+	if err, _ := v["error"].([]interface{}); len(err) > 0 {
+		panic(err)
 	}
-	if this.IsTrade() || mf.IsTrade() { // {{{2
-		return false
-	}
-	if this.AE != mf.AE ||
-		len(this.Feed[0].(OrderBook)) != len(mf.Feed[0].(OrderBook)) ||
-		len(this.Feed[1].(OrderBook)) != len(mf.Feed[1].(OrderBook)) {
-		return false
-	}
-	for i, o := range mf.Feed[0].(OrderBook) { // asks
-		if this.Feed[0].(OrderBook)[i].Amount != o.Amount ||
-			this.Feed[0].(OrderBook)[i].Price != o.Price {
-			return false
+	result := v["result"].(map[string]interface{})
+	var trades []interface{}
+	for key := range result {
+		if key != "last" {
+			trades = result[key].([]interface{})
+			break
 		}
 	}
-	for i, o := range mf.Feed[1].(OrderBook) { // bids
-		if this.Feed[1].(OrderBook)[i].Amount != o.Amount ||
-			this.Feed[1].(OrderBook)[i].Price != o.Price {
-			return false
-		}
+	for _, trade := range trades {
+		encodeUMF(newUMF(asset, "kraken", tradeKraken(asset, trade.([]interface{}))))
 	}
-	return true
+	w.Flush()
 }

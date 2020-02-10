@@ -10,104 +10,63 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
-	"strings"
 )
 
-// see also:
-// - https://golang.org/doc/code.html
+// See also:
+// - https://github.com/fatih/vim-go/wiki/Tutorial
+// - https://play.golang.org/p/ftgPNp31_j4
 
-func moreTrades(asset, feeds string, enc *json.Encoder) { // {{{1
-	for _, feed := range strings.Fields(feeds) {
-		if feed == "kraken" { // TODO implement {{{2
-			continue
-		}
-		a := asset
-		if feed == "coinbase" {
-			a += "-"
-		}
-		cmd := exec.Command("./feed.sh", feed, a+"USD")
-		pipe, err := cmd.StdoutPipe()
-		if err != nil {
-			log.Fatal("moreTrades 1 ", err)
-		}
-		if err := cmd.Start(); err != nil {
-			log.Fatal("moreTrades 2 ", err)
-		} // }}}2
-		var v []interface{}
-		var buf bytes.Buffer
-		tee := io.TeeReader(bufio.NewReaderSize(pipe, 16384), &buf)
+func main() { // {{{1
+	ToUMF(os.Args[1], os.Args[2])
+}
+
+var ob = func() *func(string) string {
+	orderbooksToUMF := func(asset string) string {
+		return asset
+	}
+	return &orderbooksToUMF
+}
+
+func ToUMF(asset, feed string) { // {{{1
+	log.Println(os.Getpid(), os.Getenv("SDEX_FEED_STARTED"), asset, feed)
+
+	var v interface{}
+	var b bytes.Buffer
+	tee := io.TeeReader(bufio.NewReaderSize(os.Stdin, 16384), &b)
+	for {
 		if err := json.NewDecoder(tee).Decode(&v); err != nil { // {{{2
-			log.Println(feed, asset, err)
-			v = nil
-			b, e := ioutil.ReadAll(&buf)
-			if e != nil {
-				log.Fatal(e)
+			b, err := ioutil.ReadAll(&b)
+			if err != nil {
+				log.Fatal(err)
 			}
 			log.Printf("===\n%s\n===\n", b)
-		}
-		if err := cmd.Wait(); err != nil {
-			log.Fatal("moreTrades 4 ", err)
-		}
-		if v == nil { // err != nil
 			continue
 		}
-
-		var q *aj.UMF // {{{2
-		var skip bool
-		for _, trade := range v {
-			if skip, q = q.MakeTrade(feed, asset, trade.(map[string]interface{})).Skip(); skip {
-				continue
+		switch v.(type) { // {{{2
+		case []interface{}:
+			array := v.([]interface{})
+			switch feed {
+			case "bitfinex_t":
+				aj.BitfinexTradesToUMF(asset, &array)
+			case "coinbase_t":
+				aj.CoinbaseTradesToUMF(asset, &array)
+			default:
+				panic("FIXME")
 			}
-			if e := enc.Encode(q); e != nil {
-				log.Println(os.Getpid(), "moreTrades 5 ", e)
+		case map[string]interface{}:
+			object := v.(map[string]interface{})
+			switch feed {
+			case "sdex_ob":
+				aj.SdexOrderbookToUMF(asset, &object)
+			case "sdex_t":
+				aj.SdexTradeToUMF(asset, &object)
+			case "kraken_t":
+				aj.KrakenTradesToUMF(asset, &object)
+			default:
+				panic("FIXME")
 			}
+		default:
+			panic("FIXME")
 		}
 	}
 }
-
-func trades(q *aj.UMF, asset, feeds, tp string, enc *json.Encoder) { // {{{1
-	if q == nil || q.IsTrade() {
-		return
-	}
-	if asset == "USD" {
-		asset = "XLM"
-	}
-	for _, pair := range strings.Fields(tp) {
-		if strings.HasPrefix(pair, asset) {
-			moreTrades(asset, feeds, enc)
-			break
-		}
-	}
-}
-
-/*func main() { // {{{1
-	asset := os.Args[1]
-	feeds := os.Getenv("FEEDS")
-	tradingPairs := os.Getenv("TRADING_PAIRS")
-	log.Println(os.Getpid(), os.Getenv("SDEX_FEED_STARTED"), asset, "; feeds:", feeds, ", tradingPairs:", tradingPairs)
-	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 16384))
-	w := bufio.NewWriterSize(os.Stdout, 65536)
-	enc := json.NewEncoder(w)
-	var q *aj.UMF
-	var skip bool
-	for {
-		var v map[string]interface{}
-		if e := dec.Decode(&v); e != nil {
-			log.Println(os.Getpid(), "dec.Decode", e)
-			break
-		}
-		if skip, q = q.MakeSDEX(asset, &v).Skip(); skip {
-			trades(q, asset, feeds, tradingPairs, enc)
-			continue
-		}
-		trades(q, asset, feeds, tradingPairs, enc)
-		if e := enc.Encode(q); e != nil {
-			log.Println(os.Getpid(), "enc.Encode", e)
-			break
-		}
-		w.Flush()
-	}
-	log.Println(os.Getpid(), "feed exiting...")
-}
-*/
