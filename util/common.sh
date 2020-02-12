@@ -1,5 +1,5 @@
 # Locals {{{1
-LOG_SIZE=s1000000
+LOG_SIZE=s10000000
 LOG_NUM=n44
 
 log () { # {{{1
