@@ -6,7 +6,11 @@
 # See also:
 #   https://docs.google.com/document/d/1h5P9SaulgMFryKERavy7s5dIiI7incNpcCiUxKBPQaI
 
-set -e # TODO remove when done debugging
+#set -e # TODO remove when done debugging
+
+# Locals {{{1
+SDEX_STARTED="sdex started for"
+
 sdex () { # {{{1
   local asset
   local ASSET=$1
@@ -14,9 +18,9 @@ sdex () { # {{{1
   local q
   . util/$ASSET.sh
 
-  log "sdex $ASSET started"
+  log "$SDEX_STARTED $ASSET"
   while true; do
-    sdex_ob $ASSET | ./feed $ASSET "sdex_ob" || break
+    sdex_ob $ASSET || break
   done | {
     while true; do
       read; q="$REPLY"
@@ -26,19 +30,20 @@ sdex () { # {{{1
         [ "$t" != 'sdex_t' -a "$asset" = 'SLT' ] && continue
         if [ "$t" = 'kraken_t' -a "$asset" = 'BTC' ]; then asset='XBT'
         elif [ "$t" != 'sdex_t' -a "$asset" = 'USD' ]; then asset='XLM'; fi
-        $t $asset | ./feed $asset "$t"
+        $t $asset
       done
       [ "$p" = "$q" ] && continue
       p="$q"; echo "$q"
     done
-  } 2>>./syserr
+  } | ./feed $ASSET 2>>./syserr
   log "sdex $ASSET exiting with $?"
 } 
 
 # Set traps, start sdex processes, and wait {{{1
 onSIGCONT () { # {{{2
   log 'received SIGCONT, killing feeds'
-  cat ./syserr | grep "$SDEX_FEED_STARTED" | kill $(awk '{print $3}')
+  #cat ./syserr | grep "$SDEX_STARTED" | kill $(awk '{print $2}')
+  ps -ef | grep "/usr/local/bin/bash ./feed.sh" | kill $(awk '{print $2}')
 } # }}}2
 
 # sudo svc -d /service/feed ==> SIGTERM, SIGCONT

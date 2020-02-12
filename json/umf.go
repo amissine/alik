@@ -143,14 +143,18 @@ func SdexTradeToUMF(asset string, p *map[string]interface{}) { // {{{1
 }
 
 func BitfinexTradesToUMF(asset string, p *[]interface{}) { // {{{1
-	for _, trade := range *p {
+	array := *p
+	for i := len(array) - 1; i >= 0; i-- {
+		trade := array[i]
 		encodeUMF(newUMF(asset, "bitfinex", tradeBitfinex(asset, trade.([]interface{}))))
 	}
 	w.Flush()
 }
 
 func CoinbaseTradesToUMF(asset string, p *[]interface{}) { // {{{1
-	for _, trade := range *p {
+	array := *p
+	for i := len(array) - 1; i >= 0; i-- {
+		trade := array[i]
 		encodeUMF(newUMF(asset, "coinbase", tradeCoinbase(asset, trade.(map[string]interface{}))))
 	}
 	w.Flush()
