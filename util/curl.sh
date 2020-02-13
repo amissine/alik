@@ -30,11 +30,13 @@ sdex_ob () { # {{{1
   local ASSET=$1
   local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
   local URL="$url/order_book?$bs&$asset"
+  local CURL_EXIT_CODE
 
   # See also:
   # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
   #
-  curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$'
+  curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$'; CURL_EXIT_CODE=$?
+  [ $CURL_EXIT_CODE -eq 0 ] || log "CURL_EXIT_CODE $CURL_EXIT_CODE"
 } 
 
 sdex_t () { # {{{1

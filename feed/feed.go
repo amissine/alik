@@ -107,12 +107,10 @@ func feed_object(po *map[string]interface{}) string { // {{{1
 func decode(r io.Reader, pb *bytes.Buffer) interface{} { // {{{1
 	var v interface{}
 	if err := json.NewDecoder(r).Decode(&v); err != nil {
-		/*
 		if err.Error() == "EOF" {
 			log.Println(os.Getpid(), "- exiting on EOF")
 			os.Exit(0)
 		}
-		*/
 		b, err2 := ioutil.ReadAll(pb)
 		if err2 != nil {
 			log.Fatal(err2)
