@@ -14,7 +14,7 @@ import (
 // locals {{{1
 var (
 	pTrade4Asset map[string][]interface{} = make(map[string][]interface{})
-	sdexXMLinUSD float64
+	sdexXLMinUSD float64
 )
 
 const (
@@ -29,12 +29,12 @@ func main() { // {{{1
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
 	for {
-		var v aj.Umf
+		var v aj.UMF
 		if e := dec.Decode(&v); e != nil {
 			log.Println(os.Getpid(), "dec.Decode", e)
 			break
 		}
-		if noSignal4Asset(&v) {
+		if !v.IsTrade() || noSignal(&v) {
 			continue
 		}
 		if e := enc.Encode(v); e != nil {
@@ -49,61 +49,61 @@ func main() { // {{{1
 //
 //  https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
 //
-func noSignal4Asset(q *aj.Umf) bool { // {{{1
+func noSignal(q *aj.UMF) bool { // {{{1
 	if !allTradesInUSD(q) {
 		return true
 	}
-	if pTrade4Asset[q.Asset] == nil {
-		pTrade4Asset[q.Asset] = make([]interface{}, 2)
-		pTrade4Asset[q.Asset][0] = q.Trade[2] // long-term EMA init value
-		pTrade4Asset[q.Asset][1] = q.Trade[2] // short-term EMA init value
+	if pTrade4Asset[q.AE.Asset] == nil {
+		pTrade4Asset[q.AE.Asset] = make([]interface{}, 2)
+		pTrade4Asset[q.AE.Asset][0] = q.Feed[2] // long-term EMA init value
+		pTrade4Asset[q.AE.Asset][1] = q.Feed[2] // short-term EMA init value
 		return true
 	}
-	pLtEMA := pTrade4Asset[q.Asset][0].(float64)
-	pStEMA := pTrade4Asset[q.Asset][1].(float64)
-	price := q.Trade[2].(float64)
+	pLtEMA := pTrade4Asset[q.AE.Asset][0].(float64)
+	pStEMA := pTrade4Asset[q.AE.Asset][1].(float64)
+	price := q.Feed[2].(float64)
 	qLtEMA := aLtEMA*price + (1.0-aLtEMA)*pLtEMA
 	qStEMA := aStEMA*price + (1.0-aStEMA)*pStEMA
 	signal_returned := signal(pLtEMA, qLtEMA, pStEMA, qStEMA)
-	pTrade4Asset[q.Asset][0], pTrade4Asset[q.Asset][1] = qLtEMA, qStEMA
-	q.Trade = append(q.Trade, signal_returned)
+	pTrade4Asset[q.AE.Asset][0], pTrade4Asset[q.AE.Asset][1] = qLtEMA, qStEMA
+	q.Feed = append(q.Feed, signal_returned)
 	q.AssumeTrade()
 	return signal_returned == UNDEF
 }
 
 // Assets are being traded on sdex and other exchanges. {{{1
-// On sdex, assets are being traded in XML. On other exchanges, assets are being
-// traded in USD. On sdex, USD is just another asset traded in XML. On other
-// exchanges, XML is just another asset traded in USD. To trade all assets
-// (including XML) on all exchanges (including sdex) in USD, we introduce the
+// On sdex, assets are being traded in XLM. On other exchanges, assets are being
+// traded in USD. On sdex, USD is just another asset traded in XLM. On other
+// exchanges, XLM is just another asset traded in USD. To trade all assets
+// (including XLM) on all exchanges (including sdex) in USD, we introduce the
 // following pseudocode:
 //
 // 1. [Skip other exchanges.] Leave a non-sdex trade data intact, exit this code.
 //
 // 2. [Asset == USD] If asset == USD, set:
-// - asset = XML;
-// - amount = amount*price; // Now it is the amount of XML traded for USD
-// - price = 1/price;       // Now it is the price of XML in USD
-// - sdexXMLinUSD = price.
+// - asset = XLM;
+// - amount = amount*price; // Now it is the amount of XLM traded for USD
+// - price = 1/price;       // Now it is the price of XLM in USD
+// - sdexXLMinUSD = price.
 //
-// 3. [Asset != USD] Otherwise, set price = price*sdexXMLinUSD.
+// 3. [Asset != USD] Otherwise, set price = price*sdexXLMinUSD.
 //
-// For example, 1 USD @ 10 XML becomes 10 XML @ 0.1 USD, and sdexXMLinUSD = 0.1.
-// Then, 1 BTC @ 70000 XML becomes 1 BTC @ 7000 USD.
-func allTradesInUSD(q *aj.Umf) bool { // {{{1
-	if q.Exchange != "sdex" {
+// For example, 1 USD @ 10 XLM becomes 10 XLM @ 0.1 USD, and sdexXLMinUSD = 0.1.
+// Then, 1 BTC @ 70000 XLM becomes 1 BTC @ 7000 USD.
+func allTradesInUSD(q *aj.UMF) bool { // {{{1
+	if q.AE.Exchange != "sdex" {
 		return true
 	}
-	if q.Asset == "USD" {
-		q.Asset = "XML"
-		q.Trade[1] = q.Trade[1].(float64) * q.Trade[2].(float64)
-		q.Trade[2] = 1.0 / q.Trade[2].(float64)
-		sdexXMLinUSD = q.Trade[2].(float64)
+	if q.AE.Asset == "USD" {
+		q.AE.Asset = "XLM"
+		q.Feed[1] = q.Feed[1].(float64) * q.Feed[2].(float64)
+		q.Feed[2] = 1.0 / q.Feed[2].(float64)
+		sdexXLMinUSD = q.Feed[2].(float64)
 	} else {
-		if sdexXMLinUSD == 0.0 {
+		if sdexXLMinUSD == 0.0 {
 			return false
 		}
-		q.Trade[2] = q.Trade[2].(float64) * sdexXMLinUSD
+		q.Feed[2] = q.Feed[2].(float64) * sdexXLMinUSD
 	}
 	return true
 }
@@ -120,5 +120,5 @@ func signal(pLt, qLt, pSt, qSt float64) string { // {{{1
 	if pSt >= pLt && qLt > qSt {
 		return "sell"
 	}
-	return UNDEF
+	return UNDEF // TODO "stop", "buy" and "sell" above being start events
 }

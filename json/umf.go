@@ -1,4 +1,4 @@
-package json
+package json // {{{1
 
 // import {{{1
 import (
@@ -177,4 +177,8 @@ func KrakenTradesToUMF(asset string, p *map[string]interface{}) { // {{{1
 		encodeUMF(newUMF(asset, "kraken", tradeKraken(asset, trade.([]interface{}))))
 	}
 	w.Flush()
+}
+
+func (this *UMF) IsTrade() bool { // {{{1
+	return len(this.Feed) > 2
 }

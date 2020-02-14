@@ -12,7 +12,6 @@ bats='&counter_asset_type=native&limit=1&order=desc' # bat suffix
 cs='--silent --no-buffer' # curl suffix
 gopts='--line-buffered --only-matching' # grep opts
 gfilter='\"counter_asset_type\":\"native\"' # preventing trades with
-# "counter_asset_code":"JPY" from showing up (a bug in SDK?)
 
 # A separate process is started for each asset traded for XLM on SDEX. {{{1
 # The process monitors the order book for the asset by calling curl. A call returns
@@ -30,13 +29,13 @@ sdex_ob () { # {{{1
   local ASSET=$1
   local asset="selling_asset_code=$ASSET&selling_asset_issuer=$ai&limit=1"
   local URL="$url/order_book?$bs&$asset"
-  local CURL_EXIT_CODE
+  local rc
 
   # See also:
   # - https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
   #
-  curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$'; CURL_EXIT_CODE=$?
-  [ $CURL_EXIT_CODE -eq 0 ] || log "CURL_EXIT_CODE $CURL_EXIT_CODE"
+  curl -H "$ch" "$URL" $cs | grep $gopts '{.*}$'; rc=$?
+  [ $rc -eq 0 ] || echo "{\"internal_error\":\"sdex_ob $ASSET rc $rc\"}"
 } 
 
 sdex_t () { # {{{1
