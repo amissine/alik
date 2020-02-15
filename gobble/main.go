@@ -19,8 +19,8 @@ var (
 
 const (
 	UNDEF          = "???"
-	aLtEMA float64 = 0.005
-	aStEMA float64 = 0.05
+	aLtEMA float64 = 0.001
+	aStEMA float64 = 0.01
 )
 
 func main() { // {{{1
@@ -28,10 +28,12 @@ func main() { // {{{1
 	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 65536))
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
+	lineNumber := 0
 	for {
 		var v aj.UMF
+		lineNumber++
 		if e := dec.Decode(&v); e != nil {
-			log.Println(os.Getpid(), "dec.Decode", e)
+			log.Println(os.Getpid(), "lineNumber", lineNumber, "dec.Decode", e)
 			break
 		}
 		if !v.IsTrade() || noSignal(&v) {

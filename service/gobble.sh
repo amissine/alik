@@ -9,6 +9,13 @@ if [ -n "$REMOTE_FEED" ]; then
   exit 0
 fi
 
+if [ -n "$HISTORICAL_UMF" ]; then
+  { cd "$HISTORICAL_UMF"
+    cat <(ls | grep '\.s' | xargs cat); echo
+  } | go run gobble/main.go 2>>./syserr
+  exit 0
+fi
+
 { cd /service/feed/log/main
   cat <(ls | grep '.s' | xargs cat)
   tail -n 999999 -F current

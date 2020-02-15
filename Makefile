@@ -10,7 +10,7 @@ SHELL := bash
 # Locals {{{1
 
 RECIPES = simulate trade order_s order_t \
-					gobble_local gobble_remote \
+					gobble_historical_umf gobble_local gobble_remote \
 					feed feed_service_update feed_up \
 					feed_hmf unzip_hmf
 
@@ -22,10 +22,11 @@ Order = /service/order/log/main/current
 Res_T = /service/trade/log/main/current
 Res_S = /service/simulate/log/main/current
 
+HISTORICAL_UMF = historical_umf/main
 REMOTE_FEED = mia-hub
 
-# Default recipe: gobble_remote {{{1
-default_recipe: gobble_remote
+# Default recipe: gobble_historical_umf {{{1
+default_recipe: gobble_historical_umf
 
 # Run service simulate {{{1
 simulate: order_s
@@ -51,6 +52,9 @@ gobble_local:
 gobble_remote:
 	@REMOTE_FEED=$(REMOTE_FEED) service/gobble.sh
 
+# Run service gobble, pipe in from local historical UMF data {{{1
+gobble_historical_umf:
+	@HISTORICAL_UMF=$(HISTORICAL_UMF) service/gobble.sh
 # Run service feed {{{1
 feed: feed_service_update feed_up
 	@echo; echo "  Goals successful: $^"; echo

@@ -234,12 +234,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 15 - ((14 * winheight(0) + 7) / 15)
+let s:l = 14 - ((6 * winheight(0) + 7) / 15)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-15
-normal! 0
+14
+normal! 022|
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
 argglobal
@@ -363,17 +363,15 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-10
+28
 normal! zo
-27
+55
 normal! zo
-50
-normal! zo
-let s:l = 25 - ((11 * winheight(0) + 14) / 29)
+let s:l = 47 - ((46 * winheight(0) + 14) / 29)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-25
+47
 normal! 0
 wincmd w
 exe '1resize ' . ((&lines * 15 + 24) / 48)
@@ -1259,16 +1257,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-52
-normal! zo
-111
-normal! zo
-let s:l = 52 - ((26 * winheight(0) + 23) / 46)
+let s:l = 22 - ((21 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-52
-normal! 0
+22
+normal! 01|
 lcd ~/go/src/github.com/amissine/alik
 tabnext
 edit ~/go/src/github.com/amissine/alik/json/simsim.go
@@ -1600,12 +1594,12 @@ normal! zt
 1
 normal! 01|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 3
+tabnext 5
 set stal=1
 badd +25 ~/go/src/github.com/amissine/alik/Makefile
 badd +1 ~/go/src/github.com/amissine/alik/service/feed_run.sh
-badd +0 ~/go/src/github.com/amissine/alik/util/XRP.sh
-badd +58 ~/go/src/github.com/amissine/alik/service/feed.sh
+badd +1 ~/go/src/github.com/amissine/alik/util/XRP.sh
+badd +1 ~/go/src/github.com/amissine/alik/service/feed.sh
 badd +1 ~/go/src/github.com/amissine/alik/util/curl.sh
 badd +57 ~/go/src/github.com/amissine/alik/feed/feed.go
 badd +1 ~/go/src/github.com/amissine/alik/json/umf.go
