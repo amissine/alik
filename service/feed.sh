@@ -14,7 +14,6 @@ SDEX_STARTED="sdex started for"
 sdex () { # {{{1
   local asset
   local ASSET=$1
-  local p
   local q
   . util/$ASSET.sh
 
@@ -32,8 +31,7 @@ sdex () { # {{{1
         elif [ "$t" != 'sdex_t' -a "$asset" = 'USD' ]; then asset='XLM'; fi
         $t $asset
       done
-      [ "$p" = "$q" ] && continue
-      p="$q"; echo "$q"
+      echo "$q"
     done
   } | ./feed $ASSET 2>>./syserr
   log "sdex $ASSET exiting with $?"
@@ -42,7 +40,6 @@ sdex () { # {{{1
 # Set traps, start sdex processes, and wait {{{1
 onSIGCONT () { # {{{2
   log 'received SIGCONT, killing feeds'
-  #cat ./syserr | grep "$SDEX_STARTED" | kill $(awk '{print $2}')
   ps -ef | grep "/usr/local/bin/bash ./feed.sh" | kill $(awk '{print $2}')
 } # }}}2
 
