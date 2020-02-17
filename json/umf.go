@@ -5,6 +5,7 @@ import ( // {{{1
 	"encoding/json"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -12,31 +13,47 @@ import ( // {{{1
 const ENCODER_BUFFER_SIZE = 1024 * 1024 // {{{1
 var w = bufio.NewWriterSize(os.Stdout, ENCODER_BUFFER_SIZE)
 var enc = json.NewEncoder(w)
-var a2e = make(map[string][]interface{}) // asset-keyed arrays to encode {{{2
-// An array to encode for a given asset has the following 5 elements:
+var s2e = make(map[string][]interface{}) // asset-keyed slices to encode {{{2
+// An slice to encode for a given asset has the following 5 elements:
 // - the asset code, for example "XLM";
-// - trades for the asset since the previous a2e[asset] has been encoded;
+// - trades for the asset since the previous s2e[asset] has been encoded;
 // - the time now;
 // - the latest SDEX asks (of type OrderBook);
 // - the latest SDEX bids (of type OrderBook).
 //
-// The trades element is an array of trades on different exchanges. Each trade is
-// an array of the following 4 elements:
+// The trades element is an slice of trades on different exchanges. Each trade is
+// a slice of the following 4 elements:
 // - the time of the trade;
 // - the exchange code, for example "kraken";
 // - the amount of the asset bought/sold, +/-;
-// - the price in USD.
+// - the price.
+//
+// On all exchanges other than SDEX, the price of the asset is given in USD.
+// On SDEX, the price is given in XLM. For the "XLM" asset on SDEX, amount is
+// actually the amount of USD that has been bought or sold for the price in XLM.
 
 func encodeUMF(p *UMF) { // {{{2
-	q, ok := a2e[p.AE.Asset]
+	q, ok := s2e[p.AE.Asset]
 	if !ok {
 		q = make([]interface{}, 5)
+		s2e[p.AE.Asset] = q
 		q[0] = p.AE.Asset
 		q[1] = make([]interface{}, 0)
 	}
 	if p.IsTrade() {
+		trade := make([]interface{}, 0)
+		trade = append(trade, p.Feed[0], p.AE.Exchange, p.Feed[1], p.Feed[2])
+		q[1] = append(q[1].([]interface{}), trade)
 	} else {
-		q[2] = p.UTC // add time, asks, and bids {{{3
+		// Sort trades, add OrderBook time, asks, and bids. {{{3
+		trades := q[1].([]interface{})
+		sort.Slice(trades, func(i, j int) bool {
+			timeI := trades[i].([]interface{})[0].(time.Time)
+			timeJ := trades[j].([]interface{})[0].(time.Time)
+			return timeI.Before(timeJ)
+		})
+		q[1] = trades
+		q[2] = p.UTC
 		q[3] = p.Feed[0]
 		q[4] = p.Feed[1] // }}}3
 		if err := enc.Encode(&q); err != nil {
@@ -159,35 +176,55 @@ func ob(b []interface{}) OrderBook { // {{{1
 }
 
 func SdexOrderbookToUMF(asset string, p *map[string]interface{}) { // {{{1
+	a := asset
+	if a == "USD" {
+		a = "XLM"
+	}
 	v := *p
 	asks, _ := v["asks"]
 	bids, _ := v["bids"]
 	feed := make([]interface{}, 2)
 	feed[0], feed[1] = ob(asks.([]interface{})), ob(bids.([]interface{}))
-	encodeUMF(newUMF(asset, "sdex", feed))
+	encodeUMF(newUMF(a, "sdex", feed))
 }
 
 func SdexTradeToUMF(asset string, p *map[string]interface{}) { // {{{1
-	encodeUMF(newUMF(asset, "sdex", tradeAsArray(p)))
+	a := asset
+	if a == "USD" {
+		a = "XLM"
+	}
+	encodeUMF(newUMF(a, "sdex", tradeAsArray(p)))
 }
 
 func BitfinexTradesToUMF(asset string, p *[]interface{}) { // {{{1
+	a := asset
+	if a == "USD" {
+		a = "XLM"
+	}
 	array := *p
 	for i := len(array) - 1; i >= 0; i-- {
 		trade := array[i]
-		encodeUMF(newUMF(asset, "bitfinex", tradeBitfinex(asset, trade.([]interface{}))))
+		encodeUMF(newUMF(a, "bitfinex", tradeBitfinex(asset, trade.([]interface{}))))
 	}
 }
 
 func CoinbaseTradesToUMF(asset string, p *[]interface{}) { // {{{1
+	a := asset
+	if a == "USD" {
+		a = "XLM"
+	}
 	array := *p
 	for i := len(array) - 1; i >= 0; i-- {
 		trade := array[i]
-		encodeUMF(newUMF(asset, "coinbase", tradeCoinbase(asset, trade.(map[string]interface{}))))
+		encodeUMF(newUMF(a, "coinbase", tradeCoinbase(asset, trade.(map[string]interface{}))))
 	}
 }
 
 func KrakenTradesToUMF(asset string, p *map[string]interface{}) { // {{{1
+	a := asset
+	if a == "USD" {
+		a = "XLM"
+	}
 	v := *p
 	if err, _ := v["error"].([]interface{}); len(err) > 0 {
 		panic(err)
@@ -201,7 +238,7 @@ func KrakenTradesToUMF(asset string, p *map[string]interface{}) { // {{{1
 		}
 	}
 	for _, trade := range trades {
-		encodeUMF(newUMF(asset, "kraken", tradeKraken(asset, trade.([]interface{}))))
+		encodeUMF(newUMF(a, "kraken", tradeKraken(asset, trade.([]interface{}))))
 	}
 }
 
