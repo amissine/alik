@@ -14,14 +14,14 @@ const ENCODER_BUFFER_SIZE = 1024 * 1024 // {{{1
 var w = bufio.NewWriterSize(os.Stdout, ENCODER_BUFFER_SIZE)
 var enc = json.NewEncoder(w)
 var s2e = make(map[string][]interface{}) // asset-keyed slices to encode {{{2
-// An slice to encode for a given asset has the following 5 elements:
+// A slice to encode for a given asset has the following 5 elements:
 // - the asset code, for example "XLM";
 // - trades for the asset since the previous s2e[asset] has been encoded;
 // - the time now;
 // - the latest SDEX asks (of type OrderBook);
 // - the latest SDEX bids (of type OrderBook).
 //
-// The trades element is an slice of trades on different exchanges. Each trade is
+// The trades element is a slice of trades on different exchanges. Each trade is
 // a slice of the following 4 elements:
 // - the time of the trade;
 // - the exchange code, for example "kraken";

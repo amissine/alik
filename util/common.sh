@@ -34,7 +34,7 @@ pipe_in_from_remote_feed () { # {{{1
 
   ( sleep 3; scp -q $ssh_client $REMOTE_FEED:$ssh_server ) &
   ssh -R 0:127.0.0.1:22 $REMOTE_FEED '{ cd /service/feed/log/main; \
-    cat <(ls | grep '.s' | xargs cat); \
+    cat <(ls | grep '\.s' | xargs cat); \
     tail -n 999999 -F current; \
   }' 2>$ssh_client
 }

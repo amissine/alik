@@ -11,6 +11,7 @@ SHELL := bash
 
 RECIPES = simulate trade order_s order_t \
 					gobble_historical_umf gobble_local gobble_remote \
+					gobble gobble_service_update gobble_up \
 					feed feed_service_update feed_up \
 					feed_hmf unzip_hmf
 
@@ -25,8 +26,8 @@ Res_S = /service/simulate/log/main/current
 HISTORICAL_UMF = historical_umf/main
 REMOTE_FEED = mia-hub
 
-# Default recipe: gobble_historical_umf {{{1
-default_recipe: gobble_historical_umf
+# Default recipe: gobble_local {{{1
+default_recipe: gobble_local
 
 # Run service simulate {{{1
 simulate: order_s
@@ -68,6 +69,21 @@ $(GOPATH)/bin/feed: feed/feed.go json/umf.go
 
 feed_up:
 	@sudo svstat /service/feed #; sudo tail -F $(Umf)
+
+# Run service gobble {{{1
+gobble: gobble_service_update gobble_up
+	@echo; echo "  Goals successful: $^"; echo
+
+gobble_service_update: $(GOPATH)/bin/gobble \
+service/gobble.sh service/gobble_run.sh service/gobble_log_run.sh
+	@sudo -E service/update.sh gobble $(Burp)
+
+$(GOPATH)/bin/gobble: gobble/main.go json/umf.go
+	@cd gobble; go install; echo "- command gobble installed in $(GOPATH)/bin"
+
+gobble_up:
+	@sudo svstat /service/gobble #; sudo tail -F $(Burp)
+
 
 #feed2telete: unzip_hmf feed_hmf {{{1
 #	@echo; echo "  Goals successful: $^"; echo

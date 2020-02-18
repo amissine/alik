@@ -8,60 +8,60 @@ map  :cprevious
 map  :cnext
 vmap gx <Plug>NetrwBrowseXVis
 nmap gx <Plug>NetrwBrowseX
-nnoremap <silent> <Plug>(go-run) :call go#cmd#Run(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-build) :call go#cmd#Build(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-generate) :call go#cmd#Generate(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-install) :call go#cmd#Install(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-test) :call go#test#Test(!g:go_jump_to_error, 0)
-nnoremap <silent> <Plug>(go-test-func) :call go#test#Func(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-test-compile) :call go#test#Test(!g:go_jump_to_error, 1)
-nnoremap <silent> <Plug>(go-coverage) :call go#coverage#Buffer(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-coverage-clear) :call go#coverage#Clear()
-nnoremap <silent> <Plug>(go-coverage-toggle) :call go#coverage#BufferToggle(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-coverage-browser) :call go#coverage#Browser(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-files) :call go#tool#Files()
-nnoremap <silent> <Plug>(go-deps) :call go#tool#Deps()
-nnoremap <silent> <Plug>(go-info) :call go#tool#Info(1)
-nnoremap <silent> <Plug>(go-import) :call go#import#SwitchImport(1, '', expand('<cword>'), '')
-nnoremap <silent> <Plug>(go-imports) :call go#fmt#Format(1)
-nnoremap <silent> <Plug>(go-implements) :call go#guru#Implements(-1)
-nnoremap <silent> <Plug>(go-callees) :call go#guru#Callees(-1)
-nnoremap <silent> <Plug>(go-callers) :call go#guru#Callers(-1)
-nnoremap <silent> <Plug>(go-describe) :call go#guru#Describe(-1)
-nnoremap <silent> <Plug>(go-callstack) :call go#guru#Callstack(-1)
-xnoremap <silent> <Plug>(go-freevars) :call go#guru#Freevars(0)
-nnoremap <silent> <Plug>(go-channelpeers) :call go#guru#ChannelPeers(-1)
-nnoremap <silent> <Plug>(go-referrers) :call go#guru#Referrers(-1)
-nnoremap <silent> <Plug>(go-sameids) :call go#guru#SameIds(1)
-nnoremap <silent> <Plug>(go-pointsto) :call go#guru#PointsTo(-1)
-nnoremap <silent> <Plug>(go-whicherrs) :call go#guru#Whicherrs(-1)
-nnoremap <silent> <Plug>(go-sameids-toggle) :call go#guru#ToggleSameIds()
-nnoremap <silent> <Plug>(go-rename) :call go#rename#Rename(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-decls) :call go#decls#Decls(0, '')
-nnoremap <silent> <Plug>(go-decls-dir) :call go#decls#Decls(1, '')
-nnoremap <silent> <Plug>(go-def) :call go#def#Jump('', 0)
-nnoremap <silent> <Plug>(go-def-vertical) :call go#def#Jump("vsplit", 0)
-nnoremap <silent> <Plug>(go-def-split) :call go#def#Jump("split", 0)
-nnoremap <silent> <Plug>(go-def-tab) :call go#def#Jump("tab", 0)
-nnoremap <silent> <Plug>(go-def-type) :call go#def#Jump('', 1)
-nnoremap <silent> <Plug>(go-def-type-vertical) :call go#def#Jump("vsplit", 1)
-nnoremap <silent> <Plug>(go-def-type-split) :call go#def#Jump("split", 1)
-nnoremap <silent> <Plug>(go-def-type-tab) :call go#def#Jump("tab", 1)
-nnoremap <silent> <Plug>(go-def-pop) :call go#def#StackPop()
-nnoremap <silent> <Plug>(go-def-stack) :call go#def#Stack()
-nnoremap <silent> <Plug>(go-def-stack-clear) :call go#def#StackClear()
-nnoremap <silent> <Plug>(go-doc) :call go#doc#Open("new", "split")
-nnoremap <silent> <Plug>(go-doc-tab) :call go#doc#Open("tabnew", "tabe")
-nnoremap <silent> <Plug>(go-doc-vertical) :call go#doc#Open("vnew", "vsplit")
-nnoremap <silent> <Plug>(go-doc-split) :call go#doc#Open("new", "split")
-nnoremap <silent> <Plug>(go-doc-browser) :call go#doc#OpenBrowser()
-nnoremap <silent> <Plug>(go-metalinter) :call go#lint#Gometa(!g:go_jump_to_error, 0)
-nnoremap <silent> <Plug>(go-lint) :call go#lint#Golint(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-vet) :call go#lint#Vet(!g:go_jump_to_error)
-nnoremap <silent> <Plug>(go-alternate-edit) :call go#alternate#Switch(0, "edit")
-nnoremap <silent> <Plug>(go-alternate-vertical) :call go#alternate#Switch(0, "vsplit")
-nnoremap <silent> <Plug>(go-alternate-split) :call go#alternate#Switch(0, "split")
 nnoremap <silent> <Plug>(go-iferr) :call go#iferr#Generate()
+nnoremap <silent> <Plug>(go-alternate-split) :call go#alternate#Switch(0, "split")
+nnoremap <silent> <Plug>(go-alternate-vertical) :call go#alternate#Switch(0, "vsplit")
+nnoremap <silent> <Plug>(go-alternate-edit) :call go#alternate#Switch(0, "edit")
+nnoremap <silent> <Plug>(go-vet) :call go#lint#Vet(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-lint) :call go#lint#Golint(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-metalinter) :call go#lint#Gometa(!g:go_jump_to_error, 0)
+nnoremap <silent> <Plug>(go-doc-browser) :call go#doc#OpenBrowser()
+nnoremap <silent> <Plug>(go-doc-split) :call go#doc#Open("new", "split")
+nnoremap <silent> <Plug>(go-doc-vertical) :call go#doc#Open("vnew", "vsplit")
+nnoremap <silent> <Plug>(go-doc-tab) :call go#doc#Open("tabnew", "tabe")
+nnoremap <silent> <Plug>(go-doc) :call go#doc#Open("new", "split")
+nnoremap <silent> <Plug>(go-def-stack-clear) :call go#def#StackClear()
+nnoremap <silent> <Plug>(go-def-stack) :call go#def#Stack()
+nnoremap <silent> <Plug>(go-def-pop) :call go#def#StackPop()
+nnoremap <silent> <Plug>(go-def-type-tab) :call go#def#Jump("tab", 1)
+nnoremap <silent> <Plug>(go-def-type-split) :call go#def#Jump("split", 1)
+nnoremap <silent> <Plug>(go-def-type-vertical) :call go#def#Jump("vsplit", 1)
+nnoremap <silent> <Plug>(go-def-type) :call go#def#Jump('', 1)
+nnoremap <silent> <Plug>(go-def-tab) :call go#def#Jump("tab", 0)
+nnoremap <silent> <Plug>(go-def-split) :call go#def#Jump("split", 0)
+nnoremap <silent> <Plug>(go-def-vertical) :call go#def#Jump("vsplit", 0)
+nnoremap <silent> <Plug>(go-def) :call go#def#Jump('', 0)
+nnoremap <silent> <Plug>(go-decls-dir) :call go#decls#Decls(1, '')
+nnoremap <silent> <Plug>(go-decls) :call go#decls#Decls(0, '')
+nnoremap <silent> <Plug>(go-rename) :call go#rename#Rename(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-sameids-toggle) :call go#guru#ToggleSameIds()
+nnoremap <silent> <Plug>(go-whicherrs) :call go#guru#Whicherrs(-1)
+nnoremap <silent> <Plug>(go-pointsto) :call go#guru#PointsTo(-1)
+nnoremap <silent> <Plug>(go-sameids) :call go#guru#SameIds(1)
+nnoremap <silent> <Plug>(go-referrers) :call go#guru#Referrers(-1)
+nnoremap <silent> <Plug>(go-channelpeers) :call go#guru#ChannelPeers(-1)
+xnoremap <silent> <Plug>(go-freevars) :call go#guru#Freevars(0)
+nnoremap <silent> <Plug>(go-callstack) :call go#guru#Callstack(-1)
+nnoremap <silent> <Plug>(go-describe) :call go#guru#Describe(-1)
+nnoremap <silent> <Plug>(go-callers) :call go#guru#Callers(-1)
+nnoremap <silent> <Plug>(go-callees) :call go#guru#Callees(-1)
+nnoremap <silent> <Plug>(go-implements) :call go#guru#Implements(-1)
+nnoremap <silent> <Plug>(go-imports) :call go#fmt#Format(1)
+nnoremap <silent> <Plug>(go-import) :call go#import#SwitchImport(1, '', expand('<cword>'), '')
+nnoremap <silent> <Plug>(go-info) :call go#tool#Info(1)
+nnoremap <silent> <Plug>(go-deps) :call go#tool#Deps()
+nnoremap <silent> <Plug>(go-files) :call go#tool#Files()
+nnoremap <silent> <Plug>(go-coverage-browser) :call go#coverage#Browser(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-coverage-toggle) :call go#coverage#BufferToggle(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-coverage-clear) :call go#coverage#Clear()
+nnoremap <silent> <Plug>(go-coverage) :call go#coverage#Buffer(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-test-compile) :call go#test#Test(!g:go_jump_to_error, 1)
+nnoremap <silent> <Plug>(go-test-func) :call go#test#Func(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-test) :call go#test#Test(!g:go_jump_to_error, 0)
+nnoremap <silent> <Plug>(go-install) :call go#cmd#Install(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-generate) :call go#cmd#Generate(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-build) :call go#cmd#Build(!g:go_jump_to_error)
+nnoremap <silent> <Plug>(go-run) :call go#cmd#Run(!g:go_jump_to_error)
 vnoremap <silent> <Plug>NetrwBrowseXVis :call netrw#BrowseXVis()
 nnoremap <silent> <Plug>NetrwBrowseX :call netrw#BrowseX(expand((exists("g:netrw_gx")? g:netrw_gx : '<cfile>')),netrw#CheckIfRemote())
 vmap <BS> "-d
@@ -376,11 +376,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 10 - ((0 * winheight(0) + 7) / 14)
+let s:l = 1 - ((0 * winheight(0) + 7) / 14)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-10
+1
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 wincmd w
@@ -1596,20 +1596,18 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-11
-normal! zo
 14
 normal! zo
-42
+40
 normal! zo
-43
+41
 normal! zo
-let s:l = 45 - ((33 * winheight(0) + 23) / 46)
+let s:l = 43 - ((42 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-45
-normal! 0
+43
+normal! 03|
 lcd ~/go/src/github.com/amissine/alik
 tabnext
 edit ~/go/src/github.com/amissine/alik/util/curl.sh
@@ -1912,15 +1910,25 @@ setlocal wrap
 setlocal wrapmargin=0
 27
 normal! zo
+32
+normal! zo
+42
+normal! zo
 54
 normal! zo
+78
+normal! zo
+96
+normal! zo
+78
+normal! zc
 107
 normal! zo
-let s:l = 54 - ((53 * winheight(0) + 23) / 46)
+let s:l = 31 - ((0 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-54
+31
 normal! 0
 lcd ~/go/src/github.com/amissine/alik
 tabnext
@@ -2079,28 +2087,22 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-13
-normal! zo
-31
-normal! zo
-41
-normal! zo
-let s:l = 42 - ((29 * winheight(0) + 23) / 46)
+let s:l = 188 - ((187 * winheight(0) + 23) / 46)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-42
-normal! 010|
+188
+normal! 01|
 lcd ~/go/src/github.com/amissine/alik
-tabnext 7
+tabnext 6
 set stal=1
 badd +1 ~/go/src/github.com/amissine/alik/Makefile
 badd +1 ~/go/src/github.com/amissine/alik/service/feed_run.sh
-badd +3 ~/go/src/github.com/amissine/alik/util/XRP.sh
+badd +1 ~/go/src/github.com/amissine/alik/util/XRP.sh
 badd +1 ~/go/src/github.com/amissine/alik/service/feed.sh
 badd +1 ~/go/src/github.com/amissine/alik/util/curl.sh
-badd +57 ~/go/src/github.com/amissine/alik/feed/feed.go
-badd +1 ~/go/src/github.com/amissine/alik/json/umf.go
+badd +1 ~/go/src/github.com/amissine/alik/feed/feed.go
+badd +0 ~/go/src/github.com/amissine/alik/json/umf.go
 badd +1 ~/go/src/github.com/amissine/alik/util/common.sh
 badd +9 ~/go/src/github.com/amissine/alik/service/update.sh
 badd +1 ~/go/src/github.com/amissine/alik/util/USD.sh
@@ -2131,7 +2133,6 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

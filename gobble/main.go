@@ -20,30 +20,32 @@ var (
 const (
 	UNDEF          = "???"
 	aLtEMA float64 = 0.001
-	aStEMA float64 = 0.01
+	aStEMA float64 = 0.005
 )
 
 func main() { // {{{1
 	log.Println(os.Getpid(), "gobble started")
-	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 65536))
+	dec := json.NewDecoder(bufio.NewReaderSize(os.Stdin, aj.ENCODER_BUFFER_SIZE))
 	w := bufio.NewWriterSize(os.Stdout, 65536)
 	enc := json.NewEncoder(w)
 	lineNumber := 0
 	for {
-		var v aj.UMF
+		var v []interface{}
 		lineNumber++
 		if e := dec.Decode(&v); e != nil {
 			log.Println(os.Getpid(), "lineNumber", lineNumber, "dec.Decode", e)
 			break
 		}
-		if !v.IsTrade() || noSignal(&v) {
-			continue
+		asset, trades := v[0].(string), v[1].([]interface{})
+		for _, trade := range trades {
+			if got, signal := signal4(asset, trade.([]interface{})); got {
+				if e := enc.Encode(signal); e != nil {
+					log.Println(os.Getpid(), "enc.Encode", e)
+					os.Exit(1)
+				}
+				w.Flush()
+			}
 		}
-		if e := enc.Encode(v); e != nil {
-			log.Println(os.Getpid(), "enc.Encode", e)
-			break
-		}
-		w.Flush()
 	}
 }
 
@@ -51,28 +53,6 @@ func main() { // {{{1
 //
 //  https://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
 //
-func noSignal(q *aj.UMF) bool { // {{{1
-	if !allTradesInUSD(q) {
-		return true
-	}
-	if pTrade4Asset[q.AE.Asset] == nil {
-		pTrade4Asset[q.AE.Asset] = make([]interface{}, 2)
-		pTrade4Asset[q.AE.Asset][0] = q.Feed[2] // long-term EMA init value
-		pTrade4Asset[q.AE.Asset][1] = q.Feed[2] // short-term EMA init value
-		return true
-	}
-	pLtEMA := pTrade4Asset[q.AE.Asset][0].(float64)
-	pStEMA := pTrade4Asset[q.AE.Asset][1].(float64)
-	price := q.Feed[2].(float64)
-	qLtEMA := aLtEMA*price + (1.0-aLtEMA)*pLtEMA
-	qStEMA := aStEMA*price + (1.0-aStEMA)*pStEMA
-	signal_returned := signal(pLtEMA, qLtEMA, pStEMA, qStEMA)
-	pTrade4Asset[q.AE.Asset][0], pTrade4Asset[q.AE.Asset][1] = qLtEMA, qStEMA
-	q.Feed = append(q.Feed, signal_returned)
-	q.AssumeTrade()
-	return signal_returned == UNDEF
-}
-
 // Assets are being traded on sdex and other exchanges. {{{1
 // On sdex, assets are being traded in XLM. On other exchanges, assets are being
 // traded in USD. On sdex, USD is just another asset traded in XLM. On other
@@ -92,22 +72,45 @@ func noSignal(q *aj.UMF) bool { // {{{1
 //
 // For example, 1 USD @ 10 XLM becomes 10 XLM @ 0.1 USD, and sdexXLMinUSD = 0.1.
 // Then, 1 BTC @ 70000 XLM becomes 1 BTC @ 7000 USD.
-func allTradesInUSD(q *aj.UMF) bool { // {{{1
-	if q.AE.Exchange != "sdex" {
-		return true
-	}
-	if q.AE.Asset == "USD" {
-		q.AE.Asset = "XLM"
-		q.Feed[1] = q.Feed[1].(float64) * q.Feed[2].(float64)
-		q.Feed[2] = 1.0 / q.Feed[2].(float64)
-		sdexXLMinUSD = q.Feed[2].(float64)
-	} else {
-		if sdexXLMinUSD == 0.0 {
-			return false
+func signal4(asset string, trade []interface{}) (bool, []interface{}) { // {{{1
+	if exchange := trade[1].(string); exchange == "sdex" { // fix sdex data {{{2
+		if asset == "XLM" {
+			amount := trade[2].(float64) // amount of USD traded
+			price := trade[3].(float64)  // price in XLM
+			amount *= price              // amount of XLM traded
+			price = 1.0 / price          // price in USD
+			sdexXLMinUSD = price
+			trade[2] = amount
+			trade[3] = price
+		} else {
+			if sdexXLMinUSD == 0.0 {
+				return false, nil
+			}
+			trade[3] = trade[3].(float64) * sdexXLMinUSD
 		}
-		q.Feed[2] = q.Feed[2].(float64) * sdexXLMinUSD
 	}
-	return true
+	if pTrade4Asset[asset] == nil { // set pTrade4Asset {{{2
+		pTrade4Asset[asset] = make([]interface{}, 2)
+		pTrade4Asset[asset][0] = trade[3] // long-term EMA init value
+		pTrade4Asset[asset][1] = trade[3] // short-term EMA init value
+		return false, nil
+	}
+	pLtEMA := pTrade4Asset[asset][0].(float64) // do the EMA step {{{2
+	pStEMA := pTrade4Asset[asset][1].(float64)
+	price := trade[3].(float64)
+	qLtEMA := aLtEMA*price + (1.0-aLtEMA)*pLtEMA
+	qStEMA := aStEMA*price + (1.0-aStEMA)*pStEMA
+	signal_returned := signal(pLtEMA, qLtEMA, pStEMA, qStEMA)
+	pTrade4Asset[asset][0], pTrade4Asset[asset][1] = qLtEMA, qStEMA
+	if signal_returned == UNDEF {
+		return false, nil
+	} else {
+		signal := make([]interface{}, 3)
+		signal[0] = trade[0] // time.Time
+		signal[1] = asset
+		signal[2] = signal_returned
+		return true, signal
+	} // }}}2
 }
 
 func signal(pLt, qLt, pSt, qSt float64) string { // {{{1
